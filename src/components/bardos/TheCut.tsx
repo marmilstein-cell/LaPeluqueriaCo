@@ -1,5 +1,5 @@
 "use client";
-// BARDOS — THE CUT (Acto III: CHOOSE)
+// LaPeluqueriaCo — THE CUT (Acto III: CHOOSE)
 // QUITAR. PULIR. DEFINIR. SER. + ¿QUÉ TE CORTAMOS?
 // Lista editorial de servicios — no cards. La elección dispara el color.
 import { useRef, useState } from "react";

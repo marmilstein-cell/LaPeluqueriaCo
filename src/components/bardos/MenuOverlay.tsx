@@ -1,5 +1,5 @@
 "use client";
-// BARDOS — Menú full-screen: otra escena de la película, no un dropdown.
+// LaPeluqueriaCo — Menú full-screen: otra escena de la película, no un dropdown.
 // Ocho ítems numerados, tipografía gigante, reacción sutil al cursor sobre las palabras.
 import { useRef, useState } from "react";
 import { motion } from "framer-motion";
@@ -47,7 +47,7 @@ export function MenuOverlay({ onClose }: { onClose: () => void }) {
     >
       {/* metadata de escena */}
       <div className="flex items-center justify-between" style={{ padding: "22px var(--grid-margin)" }}>
-        <span className="type-micro text-smoke">BARDOS / MENÚ</span>
+        <span className="type-micro text-smoke">LaPeluqueriaCo / MENÚ</span>
         <button onClick={onClose} className="b-link" aria-label="Cerrar menú">
           CERRAR ×
         </button>
@@ -113,7 +113,7 @@ export function MenuOverlay({ onClose }: { onClose: () => void }) {
           <PassLookup onDone={onClose} />
         </div>
         <div className="flex flex-col items-start gap-1 text-smoke sm:items-end sm:text-right">
-          <span className="type-micro">SAN MARTÍN DE LOS ANDES — NEUQUÉN</span>
+          <span className="type-micro">CABA — NEUQUÉN</span>
           <span className="type-micro">MAR–SÁB / 10–20 HS</span>
           <span className="type-micro mt-2 hidden md:inline-flex md:items-center md:gap-2">
             <kbd

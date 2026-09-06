@@ -1,5 +1,5 @@
 "use client";
-// BARDOS — THE PEOPLE (Acto II — medium shot)
+// LaPeluqueriaCo — THE PEOPLE (Acto II — medium shot)
 // Retrato editorial del barbero. Treatment: PEOPLE, mirada directa.
 // Al elegir al barbero se cruza al Session Builder (el rojo aparece con la decisión).
 import { useRef, useState } from "react";

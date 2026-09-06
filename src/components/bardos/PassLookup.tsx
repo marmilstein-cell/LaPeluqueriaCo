@@ -1,5 +1,5 @@
 "use client";
-// BARDOS — PASS LOOKUP: "¿tenés un código?" Encontrá tu pase con BRD-XXXX.
+// LaPeluqueriaCo — PASS LOOKUP: "¿tenés un código?" Encontrá tu pase con BRD-XXXX.
 // Acepta "247", "brd-247", "BRD-0247". Vive en el menú y en el error del pase.
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";

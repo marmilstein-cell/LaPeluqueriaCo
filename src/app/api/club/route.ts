@@ -1,4 +1,4 @@
-// BARDOS — EL CLUB: signup público de la lista de los viernes.
+// LaPeluqueriaCo — EL CLUB: signup público de la lista de los viernes.
 // POST { name, contact } → alta en la lista (dedupe por contacto).
 // El contacto acepta email o teléfono: al club se entra por cualquiera de las dos puertas.
 import { NextRequest, NextResponse } from "next/server";

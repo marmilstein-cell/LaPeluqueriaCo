@@ -36,8 +36,8 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   metadataBase: new URL("https://bardos.barber"),
   title: {
-    default: "BARDOS — Barbería · San Martín de los Andes",
-    template: "%s — BARDOS",
+    default: "LaPeluqueriaCo — Barbería · San Martín de los Andes",
+    template: "%s — LaPeluqueriaCo",
   },
   description:
     "El corte como acto de edición. Bardos no es una barbería: es una película editorial sobre identidad, estilo y oficio. Reservá tu sesión en San Martín de los Andes, Patagonia.",
@@ -49,17 +49,17 @@ export const metadata: Metadata = {
     "Bardos",
   ],
   openGraph: {
-    title: "BARDOS — BARBER. San Martín de los Andes.",
+    title: "LaPeluqueriaCo — BARBER. San Martín de los Andes.",
     description:
       "Una barbería editada como una película. Elegí tu servicio y tu hora. CORTÁ EL RUIDO.",
     type: "website",
     locale: "es_AR",
-    siteName: "BARDOS",
+    siteName: "LaPeluqueriaCo",
     images: [{ url: "/images/og-cover.webp", width: 1344, height: 768 }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "BARDOS — BARBER. San Martín de los Andes.",
+    title: "LaPeluqueriaCo — BARBER. San Martín de los Andes.",
     description: "El corte como acto de edición. Reservá tu sesión.",
   },
   icons: { icon: "/logo.svg" },

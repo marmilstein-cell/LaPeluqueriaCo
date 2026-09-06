@@ -1,5 +1,5 @@
 "use client";
-// BARDOS — Session Builder, paso 02: BARBERO ("¿QUIÉN TE CORTA?")
+// LaPeluqueriaCo — Session Builder, paso 02: BARBERO ("¿QUIÉN TE CORTA?")
 // Hoy hay un solo barbero: cuando eligible.length === 1 se renderiza como
 // feature card a ancho completo (editorial), no como grilla rota.
 import { motion } from "framer-motion";

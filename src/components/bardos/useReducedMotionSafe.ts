@@ -1,5 +1,5 @@
 "use client";
-// BARDOS — prefers-reduced-motion sin romper la hidratación.
+// LaPeluqueriaCo — prefers-reduced-motion sin romper la hidratación.
 //
 // EL PROBLEMA. useReducedMotion() de framer-motion hace, textualmente:
 //

@@ -1,5 +1,5 @@
 "use client";
-// BARDOS — SESSION PASS (Acto V: ARRIVE)
+// LaPeluqueriaCo — SESSION PASS (Acto V: ARRIVE)
 // La confirmación como ceremonia + el pase como objeto de marca persistente.
 // Vive en una URL real (#session/BRD-XXXX): se guarda, se comparte, se
 // consulta, se cancela y se reprograma.
@@ -183,7 +183,7 @@ export function SessionPass() {
                 >
                   <PassCard session={active} />
 
-                  {/* NOS VEMOS EN BARDOS, con el dato dinámico */}
+                  {/* NOS VEMOS EN LaPeluqueriaCo, con el dato dinámico */}
                   <motion.p
                     className="font-editorial-italic text-center text-[clamp(20px,2.6vw,30px)] text-chalk/90"
                     initial={{ opacity: 0 }}
@@ -287,7 +287,7 @@ function PassCard({ session }: { session: Session }) {
 
       <div className="px-6 pb-6 pt-6 md:px-8">
         <div className="flex items-baseline justify-between">
-          <p className="font-display text-[18px] tracking-[0.06em]">BARDOS</p>
+          <p className="font-display text-[18px] tracking-[0.06em]">LaPeluqueriaCo</p>
           <p className="font-system text-[11px] tracking-[0.18em] text-black/60">
             SESSION / {session.id}
           </p>
@@ -332,7 +332,7 @@ function PassCard({ session }: { session: Session }) {
               ))}
             </div>
             <span className="font-system text-right text-[10px] leading-[1.5] tracking-[0.18em] text-black/60">
-              SAN MARTÍN DE LOS ANDES — {new Date(session.createdAt).getFullYear() || "BARDOS"}
+              CABA — {new Date(session.createdAt).getFullYear() || "LaPeluqueriaCo"}
             </span>
           </div>
 
@@ -364,7 +364,7 @@ function PassCard({ session }: { session: Session }) {
       <div className="border-t border-black/10 px-6 pb-6 pt-4 md:px-8">
         <p className="font-system max-w-[44ch] text-[10px] leading-[1.6] tracking-[0.08em] text-black/55">
           PRESENTÁ ESTE PASE AL LLEGAR — AV. SAN MARTÍN 2123, GALERÍA LOS NOGALES,
-          SAN MARTÍN DE LOS ANDES. LLEGÁ 5 MIN ANTES. SI NO PODÉS VENIR, CORTÁ EL
+          CABA. LLEGÁ 5 MIN ANTES. SI NO PODÉS VENIR, CORTÁ EL
           TURNO DESDE ESTE MISMO LINK.
         </p>
       </div>
@@ -435,7 +435,7 @@ function PassActions({
     if (typeof navigator !== "undefined" && navigator.share) {
       try {
         await navigator.share({
-          title: `BARDOS — TURNO ${session.id}`,
+          title: `LaPeluqueriaCo — TURNO ${session.id}`,
           text: shareText,
           url: passUrl,
         });
@@ -596,13 +596,13 @@ function buildICS(s: Session): string {
   const ics = [
     "BEGIN:VCALENDAR",
     "VERSION:2.0",
-    "PRODID:-//BARDOS//Session//ES",
+    "PRODID:-//LaPeluqueriaCo//Session//ES",
     "BEGIN:VEVENT",
     `UID:${s.id}@bardos.barber`,
     `DTSTAMP:${fmt(new Date())}`,
     `DTSTART:${fmt(start)}`,
     `DTEND:${fmt(end)}`,
-    `SUMMARY:BARDOS — ${s.serviceId.toUpperCase().replace("-", " + ")}`,
+    `SUMMARY:LaPeluqueriaCo — ${s.serviceId.toUpperCase().replace("-", " + ")}`,
     `LOCATION:${SHOP.address}\\, San Martín de los Andes\\, Neuquén`,
     `DESCRIPTION:Turno ${s.id} con ${artistDisplayName(s.artistId)}. Presentá tu pase al llegar.`,
     "END:VEVENT",
@@ -634,7 +634,7 @@ function PrintPass({ session }: { session: Session }) {
     <div data-print-root="pass" className="print-pass">
       <header className="pp-header">
         <div>
-          <p className="pp-brand">BARDOS — BARBERÍA · SAN MARTÍN DE LOS ANDES</p>
+          <p className="pp-brand">LaPeluqueriaCo — BARBERÍA · CABA</p>
           <h1 className="pp-title">
             {cancelled ? "PASE CORTADO" : "PASE DE SESIÓN"}
           </h1>
@@ -660,7 +660,7 @@ function PrintPass({ session }: { session: Session }) {
       <hr className="pp-cut" />
 
       <footer className="pp-footer">
-        {SHOP.address}, SAN MARTÍN DE LOS ANDES · {SHOP.openHour}:00–{SHOP.closeHour}:00 HS
+        {SHOP.address}, CABA · {SHOP.openHour}:00–{SHOP.closeHour}:00 HS
         <br />
         PRESENTÁ ESTE PASE AL LLEGAR · CORTÁ EL RUIDO
       </footer>

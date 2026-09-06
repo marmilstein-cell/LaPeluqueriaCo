@@ -14,7 +14,7 @@ const SERVICES = [
 ];
 
 const ARTISTS = [
-  { id: "tomas", name: "TOMÁS BUCHETT", tag: "EL BARBERO", specialty: "CORTE · BARBA · NAVAJA", bio: "Tomás Buchett corta como quien edita: primero escucha, después quita. Tijera, máquina y navaja con la seriedad de quien firma cada cabeza que sale de su silla.", photo: "/images/artist-tomas.webp", rank: 1, services: ["corte", "corte-barba", "color", "tratamiento", "ritual"] },
+  { id: "santi", name: "TOMÁS BUCHETT", tag: "EL BARBERO", specialty: "CORTE · BARBA · NAVAJA", bio: "Santi Moro corta como quien edita: primero escucha, después quita. Tijera, máquina y navaja con la seriedad de quien firma cada cabeza que sale de su silla.", photo: "/images/artist-santi.webp", rank: 1, services: ["corte", "corte-barba", "color", "tratamiento", "ritual"] },
 ];
 
 // ---------- Datos demo (agenda viva para la cabina y el sitio) ----------
@@ -41,8 +41,8 @@ const DEMO_BOOKINGS: {
 ];
 
 const DEMO_BLOCKS = [
-  { artistId: "tomas", date: "2026-09-10", time: "13:30", minutes: 60, reason: "ALMUERZO" },
-  { artistId: "tomas", date: "2026-09-11", time: "11:00", minutes: 30, reason: "PROVEEDOR" },
+  { artistId: "santi", date: "2026-09-10", time: "13:30", minutes: 60, reason: "ALMUERZO" },
+  { artistId: "santi", date: "2026-09-11", time: "11:00", minutes: 30, reason: "PROVEEDOR" },
 ];
 
 async function main() {
@@ -69,7 +69,7 @@ async function main() {
     }
   }
 
-  // 3) Datos demo: la agenda de Tomás (8 al 12 de sep 2026) + 2 bloqueos
+  // 3) Datos demo: la agenda de Santi (8 al 12 de sep 2026) + 2 bloqueos
   const svcById = new Map(SERVICES.map((s) => [s.id, s]));
   for (const b of DEMO_BOOKINGS) {
     const svc = svcById.get(b.serviceId);
@@ -78,7 +78,7 @@ async function main() {
       data: {
         id: b.id,
         serviceId: b.serviceId,
-        artistId: "tomas",
+        artistId: "santi",
         date: b.date,
         time: b.time,
         minutes: svc.minutes,

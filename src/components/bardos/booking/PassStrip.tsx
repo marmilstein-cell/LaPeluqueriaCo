@@ -1,5 +1,5 @@
 "use client";
-// BARDOS — TUS PASES: el historial local del cliente (08.8, mínimo viable).
+// LaPeluqueriaCo — TUS PASES: el historial local del cliente (08.8, mínimo viable).
 // Cada pase creado desde este navegador queda acá: código, día, estado vivo
 // (consultado contra el server), click → se abre el pase.
 import { useQuery } from "@tanstack/react-query";

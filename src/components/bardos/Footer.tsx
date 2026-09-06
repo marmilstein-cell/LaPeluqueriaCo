@@ -1,5 +1,5 @@
 "use client";
-// BARDOS — FOOTER: créditos finales de la película, no un sitemap.
+// LaPeluqueriaCo — FOOTER: créditos finales de la película, no un sitemap.
 import { motion } from "framer-motion";
 import { Slate, Reveal } from "./scene-utils";
 import { scrollToScene } from "./providers";
@@ -54,7 +54,7 @@ export function Footer() {
         {/* línea final */}
         <div className="mt-14 flex flex-col gap-6 border-t border-line pt-6 md:flex-row md:items-center md:justify-between">
           <p className="type-micro text-smoke">
-            BARDOS — {SHOP.address.toUpperCase()} — MAR–SÁB 10–20
+            LaPeluqueriaCo — {SHOP.address.toUpperCase()} — MAR–SÁB 10–20
           </p>
           <nav className="flex flex-wrap gap-x-6 gap-y-2" aria-label="Navegación de cierre">
             <button onClick={() => scrollToScene("the-cut")} className="b-link">
@@ -71,7 +71,7 @@ export function Footer() {
             </button>
           </nav>
           <p className="type-micro text-smoke">
-            © BARDOS — HECHO A NAVAJA EN SAN MARTÍN DE LOS ANDES
+            © LaPeluqueriaCo — HECHO A NAVAJA EN CABA
           </p>
         </div>
       </div>

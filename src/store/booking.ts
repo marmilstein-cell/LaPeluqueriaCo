@@ -1,5 +1,5 @@
 "use client";
-// BARDOS — estado del Session Builder (Zustand + sessionStorage)
+// LaPeluqueriaCo — estado del Session Builder (Zustand + sessionStorage)
 // Persiste entre pasos y sobrevive a un refresh accidental (brief 21).
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";

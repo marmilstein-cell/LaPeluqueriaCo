@@ -1,5 +1,5 @@
 "use client";
-// BARDOS — THE SPACE (ubicación, horarios y contacto integrados narrativamente)
+// LaPeluqueriaCo — THE SPACE (ubicación, horarios y contacto integrados narrativamente)
 // No un footer con íconos: cómo llegar, cuándo, de noche.
 // El estado ABIERTO/CERRADO se calcula en vivo contra la hora real de
 // San Martín de los Andes (useSyncExternalStore con snapshot cacheada — sin setState en effects).
@@ -127,7 +127,7 @@ export function TheSpace() {
             <p className="type-micro text-smoke">DÓNDE</p>
             <div>
               <p className="font-display text-[clamp(18px,2vw,26px)] text-offwhite">{SHOP.address}</p>
-              <p className="type-mono-label mt-2 text-bone">SAN MARTÍN DE LOS ANDES — NEUQUÉN</p>
+              <p className="type-mono-label mt-2 text-bone">CABA — NEUQUÉN</p>
               <div className="mt-5 flex flex-col gap-3">
                 <a href={mapsUrl} target="_blank" rel="noopener noreferrer" className="b-link">
                   CÓMO LLEGAR →

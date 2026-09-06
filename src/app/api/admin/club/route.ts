@@ -1,4 +1,4 @@
-// BARDOS — LA CABINA: LA LISTA del club (altas públicas del Archive).
+// LaPeluqueriaCo — LA CABINA: LA LISTA del club (altas públicas del Archive).
 // GET → quiénes se anotaron para la lista de los viernes.
 // El barbero la mira antes del viernes y la copia para avisar.
 // Acceso: header x-cabina-code (compartido con agenda y clientes).

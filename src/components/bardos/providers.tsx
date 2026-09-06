@@ -1,5 +1,5 @@
 "use client";
-// BARDOS — providers raíz: React Query + Lenis (scroll cinematográfico)
+// LaPeluqueriaCo — providers raíz: React Query + Lenis (scroll cinematográfico)
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import Lenis from "lenis";

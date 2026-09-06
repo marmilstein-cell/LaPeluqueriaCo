@@ -1,5 +1,5 @@
 "use client";
-// BARDOS — Session Tracker (08.4): el resumen progresivo.
+// LaPeluqueriaCo — Session Tracker (08.4): el resumen progresivo.
 // SERVICIO — — — → SERVICIO — BARBERO — FECHA — HORA → TU TURNO ESTÁ LISTO.
 import { motion, AnimatePresence } from "framer-motion";
 import { useBooking } from "@/store/booking";

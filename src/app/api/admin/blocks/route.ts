@@ -1,4 +1,4 @@
-// BARDOS — LA CABINA: bloqueo y desbloqueo de horarios.
+// LaPeluqueriaCo — LA CABINA: bloqueo y desbloqueo de horarios.
 // POST   { artistId, date, time, minutes?, reason? } → crea bloqueo (30/60/90/120′)
 // DELETE ?id=…                                      → lo corta
 // Acceso: header x-cabina-code (compartido con agenda).

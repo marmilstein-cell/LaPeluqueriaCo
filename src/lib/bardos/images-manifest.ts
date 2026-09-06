@@ -1,4 +1,4 @@
-// BARDOS — manifest de blur placeholders (generado por scripts/process-images.mjs)
+// LaPeluqueriaCo — manifest de blur placeholders (generado por scripts/process-images.mjs)
 // 2026-09-05T22:10:03.113Z
 const manifest: Record<string, { w: number; h: number; blur: string }> = {
   "/images/service-beard.webp": {

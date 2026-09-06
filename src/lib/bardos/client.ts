@@ -1,5 +1,5 @@
 "use client";
-// BARDOS — cliente tipado de las APIs del booking engine
+// LaPeluqueriaCo — cliente tipado de las APIs del booking engine
 import type { Artist, Service, Session } from "./domain";
 
 export interface CatalogResponse {

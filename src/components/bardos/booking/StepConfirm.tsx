@@ -1,5 +1,5 @@
 "use client";
-// BARDOS — Session Builder, paso 06: CONFIRMAR
+// LaPeluqueriaCo — Session Builder, paso 06: CONFIRMAR
 // "TU TURNO" final + confirmación como ceremonia.
 // Edge case 08.10: si el turno cayó mientras confirmabas, se corta y ofrece alternativas.
 import { useState } from "react";

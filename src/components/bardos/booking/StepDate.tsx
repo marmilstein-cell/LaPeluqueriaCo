@@ -1,5 +1,5 @@
 "use client";
-// BARDOS — Session Builder, paso 03: FECHA ("¿CUÁNDO?")
+// LaPeluqueriaCo — Session Builder, paso 03: FECHA ("¿CUÁNDO?")
 // Calendario bespoke: grilla editorial de días, pensada para pulgar en mobile.
 import { motion } from "framer-motion";
 import { StepShell } from "./StepShell";

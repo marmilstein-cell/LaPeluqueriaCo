@@ -1,5 +1,5 @@
 "use client";
-// BARDOS — Session Builder, paso 04: HORA ("¿CUÁNDO?")
+// LaPeluqueriaCo — Session Builder, paso 04: HORA ("¿CUÁNDO?")
 // Slots reales desde la API. Los tomados llegan cortados (metáfora central).
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";

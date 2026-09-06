@@ -1,5 +1,5 @@
 "use client";
-// BARDOS — Nav: minimal y contextual. BARDOS / MENÚ / TURNO.
+// LaPeluqueriaCo — Nav: minimal y contextual. LaPeluqueriaCo / MENÚ / TURNO.
 // Se esconde en scroll-down, reaparece en scroll-up. TURNO siempre a una interacción
 // — o a una tecla: T es el atajo directo al Session Builder (mientras no se escriba).
 // La hairline roja superior mide el progreso del scroll: "el corte avanza".
@@ -69,7 +69,7 @@ export function Nav() {
             className="font-display text-[15px] tracking-[0.08em] text-offwhite hover:text-red transition-colors duration-200"
             aria-label="Bardos — volver al inicio"
           >
-            BARDOS
+            LaPeluqueriaCo
           </button>
 
           <nav className="flex items-center gap-8" aria-label="Navegación principal">

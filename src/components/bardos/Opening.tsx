@@ -1,8 +1,8 @@
 "use client";
-// BARDOS — OPENING (Acto I: ENTER) — hero cinematográfico.
+// LaPeluqueriaCo — OPENING (Acto I: ENTER) — hero cinematográfico.
 // Video macro (tijera, máquina, navaja, pelo cayendo) como material vivo:
 // se mueve con el scroll (zoom, paneo, letterbox que se aprieta) + parallax
-// de cursor. Sobre él, la coreografía tipográfica: BARDOS entra letra a letra
+// de cursor. Sobre él, la coreografía tipográfica: LaPeluqueriaCo entra letra a letra
 // (rotateX + blur), se parte por la línea de corte roja, hard cut a negro →
 // BARBER. entra desde los costados (skew + blur + alternado) y se dispersa
 // al salir, mientras un marquee cinético desliza la geografía del local.
@@ -23,11 +23,11 @@ import {
 import { BImage } from "./BImage";
 import { useReducedMotionSafe } from "./useReducedMotionSafe";
 
-const LETTERS = ["B", "A", "R", "D", "O", "S"];
+const LETTERS = ["P", "E", "L", "U", "Q", "U", "E", "R", "Í", "A"];
 const BARBER = ["B", "A", "R", "B", "E", "R"];
 const MARQUEE_LINE =
-  "SAN MARTÍN DE LOS ANDES — PATAGONIA — BARBERÍA — EST. MMXIX — EL CORTE COMO EDICIÓN — ";
-const MARQUEE_TOP = "BARDOS — BARBER — ";
+  "CABA — BUENOS AIRES — PELUQUERÍA — EST. MMXIX — EL CORTE COMO EDICIÓN — ";
+const MARQUEE_TOP = "LaPeluqueriaCo — BARBER — ";
 
 /* El clip del hero (public/videos/hero.mp4): 10s · 24fps · 240 fotogramas,
    encodeado all-intra — cada fotograma es keyframe, así que el seek cae
@@ -66,7 +66,7 @@ export function Opening() {
   const overlayOpacity = useTransform(scrollYProgress, [0, 0.55], [1, 0.55]); // 45% → ~25%
   const letterbox = useTransform(scrollYProgress, [0.5, 0.75], [0, 1]);
 
-  /* --- L2 · BARDOS: el corte abre la palabra --- */
+  /* --- L2 · LaPeluqueriaCo: el corte abre la palabra --- */
   const gap = useTransform(scrollYProgress, [0.28, 0.45], [0, 1]); // apertura de la palabra
   const topShift = useTransform(gap, (g) => -vh(g));
   const bottomShift = useTransform(gap, (g) => vh(g));
@@ -275,14 +275,14 @@ export function Opening() {
             className="type-micro absolute inset-x-0 top-0 z-[1] flex h-[9%] items-center text-bone/60"
             style={{ opacity: reduced ? 1 : barLabelOpacity, paddingInline: "var(--grid-margin)" }}
           >
-            BARDOS
+            LaPeluqueriaCo
           </motion.span>
           <motion.span
             aria-hidden="true"
             className="type-micro absolute inset-x-0 bottom-0 z-[1] flex h-[9%] items-center justify-end text-bone/60"
             style={{ opacity: reduced ? 1 : barLabelOpacity, paddingInline: "var(--grid-margin)" }}
           >
-            SAN MARTÍN DE LOS ANDES — PATAGONIA
+            CABA — BUENOS AIRES
           </motion.span>
         </motion.div>
 
@@ -337,7 +337,7 @@ export function Opening() {
             filter: reduced ? undefined : wordFilter,
           }}
         >
-          <div className="relative select-none" aria-label="BARDOS" style={{ perspective: 900 }}>
+          <div className="relative select-none" aria-label="LaPeluqueriaCo" style={{ perspective: 900 }}>
             <span aria-hidden="true" className="block">
               <HalfWord clip="inset(0 0 50% 0)" y={reduced ? undefined : topShift} sx={sx} reduced={reduced} />
             </span>
@@ -385,13 +385,13 @@ export function Opening() {
 
         {/* --- L5 · slates de esquina: metadata del fotograma --- */}
         <CornerSlate index={0} progress={scrollYProgress} reduced={reduced} className="left-0 top-24">
-          BARDOS®
+          LaPeluqueriaCo®
         </CornerSlate>
         <CornerSlate index={1} progress={scrollYProgress} reduced={reduced} className="right-0 top-24 text-right">
-          SAN MARTÍN DE LOS ANDES
+          CABA
         </CornerSlate>
         <CornerSlate index={2} progress={scrollYProgress} reduced={reduced} className="bottom-28 left-0">
-          PATAGONIA — ARGENTINA
+          BUENOS AIRES — ARGENTINA
         </CornerSlate>
         <CornerSlate index={3} progress={scrollYProgress} reduced={reduced} className="bottom-28 right-0 text-right">
           ESCENA 01 — ENTRADA
@@ -447,7 +447,7 @@ function IntroMeta() {
         animate={{ opacity: done ? 0 : 0.9 }}
         transition={{ duration: 1 }}
       >
-        <span className="type-micro text-bone">SAN MARTÍN DE LOS ANDES</span>
+        <span className="type-micro text-bone">CABA</span>
         <span className="type-micro text-smoke">EST. MMXIX</span>
       </motion.div>
 
@@ -468,7 +468,7 @@ function IntroMeta() {
         animate={done ? { opacity: 0, y: 8 } : { opacity: 1, y: 0 }}
         transition={{ duration: 0.8, delay: 0.4, ease: [0.16, 1, 0.3, 1] }}
       >
-        <p className="type-micro text-bone">BARDOS / SAN MARTÍN DE LOS ANDES</p>
+        <p className="type-micro text-bone">LaPeluqueriaCo / CABA</p>
       </motion.div>
     </>
   );

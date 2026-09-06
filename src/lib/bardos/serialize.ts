@@ -1,4 +1,4 @@
-// BARDOS — utilidades de serialización Prisma → contrato UI (Apéndice C)
+// LaPeluqueriaCo — utilidades de serialización Prisma → contrato UI (Apéndice C)
 import { Artist, Service, Session, slotId } from "./domain";
 
 type PrismaService = {

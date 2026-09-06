@@ -1,5 +1,5 @@
 "use client";
-// BARDOS — cursor contextual (sección 11.1)
+// LaPeluqueriaCo — cursor contextual (sección 11.1)
 // Casi invisible: un punto de 4px que se vuelve rojo sobre interacción/booking.
 // Nunca protagonista. En touch: no existe.
 import { useEffect, useState } from "react";

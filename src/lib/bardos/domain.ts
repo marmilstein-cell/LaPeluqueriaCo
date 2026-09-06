@@ -1,4 +1,4 @@
-// BARDOS — dominio compartido del booking engine (contrato Apéndice C)
+// LaPeluqueriaCo — dominio compartido del booking engine (contrato Apéndice C)
 
 export interface Service {
   id: string;
@@ -59,8 +59,8 @@ export interface Session {
 // ---------- Configuración del negocio ----------
 
 export const SHOP = {
-  name: "BARDOS",
-  city: "SAN MARTÍN DE LOS ANDES",
+  name: "LAPELUQUERIACO",
+  city: "CABA",
   // días de atención: martes(2) a sábado(6) — number[] para includes(day)
   openDays: [2, 3, 4, 5, 6] as number[],
   openHour: 10, // 10:00
@@ -68,13 +68,13 @@ export const SHOP = {
   slotStep: 30, // granularidad de turnos (min)
   leadMinutes: 45, // anticipación mínima para reservar
   daysAhead: 21, // ventana de reserva
-  address: "Av. San Martín 2123, Galería Los Nogales",
-  phoneWa: "5492944603267", // WhatsApp del local (wa.me)
-  instagram: "@bardos.bbca",
+  address: "Olleros 3582, Colegiales",
+  phoneWa: "5491100000000", // WhatsApp del local (wa.me) - placeholder
+  instagram: "@lapeluqueriaco",
 } as const;
 
 /** Nombre visible del barbero por id — hoy hay un solo barbero. */
-const ARTIST_NAMES: Record<string, string> = { tomas: "TOMÁS BUCHETT" };
+const ARTIST_NAMES: Record<string, string> = { santi: "SANTI MORO" };
 export function artistDisplayName(id: string): string {
   return ARTIST_NAMES[id] ?? id.toUpperCase();
 }

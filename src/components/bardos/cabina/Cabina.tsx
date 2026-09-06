@@ -1,5 +1,5 @@
 "use client";
-// BARDOS — LA CABINA (backoffice de barberos, brief 08.11)
+// LaPeluqueriaCo — LA CABINA (backoffice de barberos, brief 08.11)
 // Escena oculta en #cabina: la agenda del día, bloqueo de horarios y caja.
 // No está en el menú: la conoce el personal. Código de acceso (CABINA_CODE).
 // Estética: la misma película, pero "entre bastidores" — mono, catálogo, rojo.
@@ -174,7 +174,7 @@ function CabinaGate({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
     >
-      <p className="type-micro text-smoke">BARDOS / SOLO PERSONAL</p>
+      <p className="type-micro text-smoke">LaPeluqueriaCo / SOLO PERSONAL</p>
       <h2 className="font-display font-display-tight type-display-md mt-4 text-offwhite">
         LA CABINA<span className="text-red">.</span>
       </h2>
@@ -287,7 +287,7 @@ function CabinaDashboard({
       {/* claqueta */}
       <div className="flex flex-wrap items-center justify-between gap-4">
         <p className="type-micro text-smoke">
-          BARDOS / CABINA — {formatLongDate(date || today)}
+          LaPeluqueriaCo / CABINA — {formatLongDate(date || today)}
           {date === today && <span className="text-red"> — HOY</span>}
         </p>
         <div className="flex items-center gap-6">
@@ -1222,7 +1222,7 @@ function PrintSheet({
     <div data-print-root="cabina" className="print-sheet">
       <header className="ps-header">
         <div>
-          <p className="ps-brand">BARDOS — LA CABINA</p>
+          <p className="ps-brand">LaPeluqueriaCo — LA CABINA</p>
           <h1 className="ps-title">HOJA DE RUTA · {formatLongDate(date)}</h1>
         </div>
         <p className="ps-meta">

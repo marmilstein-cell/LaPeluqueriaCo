@@ -1,5 +1,5 @@
 "use client";
-// BARDOS — Session Builder, paso 01: SERVICIO ("¿QUÉ TE CORTAMOS?")
+// LaPeluqueriaCo — Session Builder, paso 01: SERVICIO ("¿QUÉ TE CORTAMOS?")
 import { motion } from "framer-motion";
 import type { Service } from "@/lib/bardos/domain";
 import { priceARS } from "@/lib/bardos/domain";

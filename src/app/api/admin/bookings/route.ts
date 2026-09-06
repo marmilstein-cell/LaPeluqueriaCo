@@ -1,4 +1,4 @@
-// BARDOS — LA CABINA: ciclo de vida de la sesión.
+// LaPeluqueriaCo — LA CABINA: ciclo de vida de la sesión.
 // PATCH { id, status: "completed" | "confirmed" } → marca el corte hecho (o lo reabre).
 // Solo transiciones válidas: confirmed → completed → confirmed (reabrir).
 // El resto del ciclo (cancelar, reprogramar) vive en el pase del cliente.

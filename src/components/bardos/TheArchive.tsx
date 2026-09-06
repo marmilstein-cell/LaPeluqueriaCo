@@ -1,5 +1,5 @@
 "use client";
-// BARDOS — THE ARCHIVE (préstamo de The Archive: profundidad de marca)
+// LaPeluqueriaCo — THE ARCHIVE (préstamo de The Archive: profundidad de marca)
 // Tira infinita del archivo fotográfico + DE LA SILLA (columna editorial:
 // la historia del local, el método, el club) + Instagram integrado narrativamente.
 import { useState } from "react";
@@ -231,7 +231,7 @@ export function TheArchive() {
             Lo de cada día está en
           </span>
           <span className="font-display font-display-tight text-[clamp(22px,3vw,40px)] text-offwhite transition-colors duration-300 group-hover:text-red">
-            @BARDOS.BBCA
+            @LaPeluqueriaCo.BBCA
           </span>
           <span
             aria-hidden="true"

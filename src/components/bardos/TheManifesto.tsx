@@ -1,5 +1,5 @@
 "use client";
-// BARDOS — EL MANIFIESTO (Acto I, después del turno) — la palabra de la casa.
+// LaPeluqueriaCo — EL MANIFIESTO (Acto I, después del turno) — la palabra de la casa.
 // La copia textual de la tesis: "Una barbería editada como una película."
 // El párrafo se revela palabra por palabra mientras cruza el viewport —
 // leer es ver el montaje en vivo: lo que entra apagado se enciende al
@@ -20,24 +20,24 @@ import { useReducedMotionSafe } from "./useReducedMotionSafe";
 
 /** La tesis, partida en tres líneas — cada una más grande que la anterior. */
 const HEAD = [
-  { text: "UNA BARBERÍA", size: "text-[clamp(38px,8vw,140px)]" },
-  { text: "EDITADA COMO", size: "text-[clamp(44px,9vw,160px)]" },
-  { text: "UNA PELÍCULA", size: "text-[clamp(50px,10vw,180px)]" },
+  { text: "UN ESTILO", size: "text-[clamp(38px,8vw,140px)]" },
+  { text: "QUE ES ÚNICO", size: "text-[clamp(44px,9vw,160px)]" },
+  { text: "TODOS LOS DÍAS", size: "text-[clamp(50px,10vw,180px)]" },
 ];
 
 /** La copia, textual. *palabra* → se enciende en rojo. */
 const PARAS: { kicker: string; text: string }[] = [
   {
-    kicker: "01 — EL GUION",
-    text: "Cada cabeza llega con *demasiado* *guion:* capas que ya no dicen nada, longitud que quedó en el capítulo anterior, una forma que nunca fue de verdad una forma.",
+    kicker: "01 — LA MAGIA",
+    text: "Cortes a tijera o *máquina,* estilos cortos y largos. Cada intercambio es único y la *magia* dice presente todos los días para hacer de la experiencia, una sensación única.",
   },
   {
-    kicker: "02 — EL MONTAJE",
-    text: "Nuestro oficio es el *montaje.* Quitamos lo que sobra para que quede lo que sos. El corte como acto de edición: precisión de *quirófano,* temperatura de bar de barrio, *silencio* *justo.*",
+    kicker: "02 — LA EXPERIENCIA",
+    text: "¿Cuál es la mejor parte? *¡Todas!* Porque en la pelu tenemos pensado cada *movimiento* y cada *sensación* desde que entrás hasta que salís por la puerta.",
   },
   {
-    kicker: "03 — EL LOCAL",
-    text: "Acá no hay espejos mágicos ni promesas de redención. Hay *sillas* *buenas,* *máquinas* *afiladas* y un barbero que lleva el oficio con la seriedad de quien firma su trabajo.",
+    kicker: "03 — LA ENERGÍA",
+    text: "Te invitamos a ser parte y probar nuestros servicios. Todos los servicios los abordamos con la misma metodología de trabajo y la mejor *energía* para lograr una hermosa experiencia.",
   },
 ];
 
@@ -206,7 +206,7 @@ export function TheManifesto() {
           MANIFIESTO — PALABRA DE LA CASA
         </Reveal>
         <Reveal delay={0.08} as="p" className="type-micro text-smoke">
-          SAN MARTÍN DE LOS ANDES — PATAGONIA
+          CABA — BUENOS AIRES
         </Reveal>
       </div>
     </section>

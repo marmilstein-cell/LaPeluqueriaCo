@@ -1,5 +1,5 @@
 "use client";
-// BARDOS — focus trap para diálogos modales (menú, pase, cabina).
+// LaPeluqueriaCo — focus trap para diálogos modales (menú, pase, cabina).
 // Al abrir: guarda el foco previo, enfoca el primero enfocable.
 // Tab/Shift+Tab ciclan dentro del contenedor. Al cerrar: restaura el foco.
 import { useEffect, type RefObject } from "react";

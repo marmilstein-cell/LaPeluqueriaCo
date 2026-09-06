@@ -1,5 +1,5 @@
 "use client";
-// BARDOS — la experiencia completa en una sola película scrolleable.
+// LaPeluqueriaCo — la experiencia completa en una sola película scrolleable.
 // Actos: ENTER → TU TURNO (book) → EL BARBERO (people) → EL OFICIO (craft)
 //        → EL CORTE (cut) → ARCHIVO → EL CUARTO (space) → RETURN (footer).
 import { BardosProviders } from "@/components/bardos/providers";

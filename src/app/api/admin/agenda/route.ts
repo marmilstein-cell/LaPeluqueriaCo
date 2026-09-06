@@ -1,4 +1,4 @@
-// BARDOS — LA CABINA (backoffice de barberos)
+// LaPeluqueriaCo — LA CABINA (backoffice de barberos)
 // Agenda del día: reservas activas + bloqueos por artista, con stats.
 // Acceso: header x-cabina-code (CABINA_CODE env, default "MMXIX").
 import { NextRequest, NextResponse } from "next/server";

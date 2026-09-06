@@ -1,4 +1,4 @@
-// BARDOS — motor de disponibilidad (server-side)
+// LaPeluqueriaCo — motor de disponibilidad (server-side)
 // La disponibilidad se computa: horarios de trabajo − reservas activas.
 // Preparado para migrar a Cal.com / Google Calendar sin tocar la UI (ver brief 08.11).
 import { db } from "@/lib/db";

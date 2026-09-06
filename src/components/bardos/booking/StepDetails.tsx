@@ -1,5 +1,5 @@
 "use client";
-// BARDOS — Session Builder, paso 05: DATOS
+// LaPeluqueriaCo — Session Builder, paso 05: DATOS
 // Datos del cliente con validación en voz de marca + línea de privacidad honesta.
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";

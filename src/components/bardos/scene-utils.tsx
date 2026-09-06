@@ -1,5 +1,5 @@
 "use client";
-// BARDOS — primitivas de escena: slate, reveal, parallax
+// LaPeluqueriaCo — primitivas de escena: slate, reveal, parallax
 import { useRef, type ReactNode } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useReducedMotionSafe } from "./useReducedMotionSafe";

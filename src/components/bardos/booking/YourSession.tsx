@@ -1,5 +1,5 @@
 "use client";
-// BARDOS — TU TURNO (Acto I, escena #book) — el Session Builder.
+// LaPeluqueriaCo — TU TURNO (Acto I, escena #book) — el Session Builder.
 // Vive inmediatamente después del hero: reservar es el primer acto.
 // Desktop: composición dividida — narrativa/foto a la izquierda (cambia con la
 // elección), selección activa a la derecha. Mobile: columna única + tracker sticky.
@@ -193,7 +193,7 @@ function ContextPanel({
     ? `BARBERO — ${artist.name}`
     : service
     ? `SERVICIO — ${service.name}`
-    : "BARDOS — ESPERANDO TU ELECCIÓN";
+    : "LaPeluqueriaCo — ESPERANDO TU ELECCIÓN";
 
   return (
     <div className="relative aspect-[4/5] overflow-hidden border border-line">

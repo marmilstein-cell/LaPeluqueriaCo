@@ -1,5 +1,5 @@
 "use client";
-// BARDOS — imagen editorial con pipeline unificado:
+// LaPeluqueriaCo — imagen editorial con pipeline unificado:
 // next/image + manifest de blur placeholders generados con sharp.
 import Image, { type ImageProps } from "next/image";
 import manifest from "@/lib/bardos/images-manifest";

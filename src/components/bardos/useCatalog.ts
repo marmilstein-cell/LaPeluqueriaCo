@@ -1,5 +1,5 @@
 "use client";
-// BARDOS — hook compartido del catálogo (React Query)
+// LaPeluqueriaCo — hook compartido del catálogo (React Query)
 import { useQuery } from "@tanstack/react-query";
 import { fetchCatalog } from "@/lib/bardos/client";
 

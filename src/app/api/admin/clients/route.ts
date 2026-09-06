@@ -1,4 +1,4 @@
-// BARDOS — LA CABINA: búsqueda de clientes por teléfono o nombre.
+// LaPeluqueriaCo — LA CABINA: búsqueda de clientes por teléfono o nombre.
 // GET ?q=… → historial de sesiones (agrupado por cliente, últimas 6 sesiones c/u)
 // El barbero contesta el teléfono y en dos teclas sabe quién es y qué tiene.
 // Acceso: header x-cabina-code (compartido con agenda).

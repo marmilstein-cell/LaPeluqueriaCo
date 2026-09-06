@@ -1,5 +1,5 @@
 "use client";
-// BARDOS — shell común de los pasos del Session Builder
+// LaPeluqueriaCo — shell común de los pasos del Session Builder
 import type { ReactNode } from "react";
 import { motion } from "framer-motion";
 

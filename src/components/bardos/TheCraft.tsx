@@ -1,5 +1,5 @@
 "use client";
-// BARDOS — THE CRAFT (Acto II — close-up / macro)
+// LaPeluqueriaCo — THE CRAFT (Acto II — close-up / macro)
 // El proceso en primer plano: video sin editar + macro shots del oficio.
 import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";

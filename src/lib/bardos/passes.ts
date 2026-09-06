@@ -1,5 +1,5 @@
 "use client";
-// BARDOS — registro local de pases de sesión (brief 08.8: cuenta/historial por cliente).
+// LaPeluqueriaCo — registro local de pases de sesión (brief 08.8: cuenta/historial por cliente).
 // Los pases creados desde este navegador quedan acá — sin cuentas, sin servidores
 // extra, sin cookies: la honestidad de siempre. Máximo 12, dedupe, orden reciente.
 import { useSyncExternalStore } from "react";
