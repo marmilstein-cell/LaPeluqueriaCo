@@ -1,0 +1,710 @@
+     1→     1→"use client";
+     2→     2→// BARDOS — OPENING (Acto I: ENTER) — hero cinematográfico.
+     3→     3→// Video macro (tijera, máquina, navaja, pelo cayendo) como material vivo:
+     4→     4→// se mueve con el scroll (zoom, paneo, letterbox que se aprieta) + parallax
+     5→     5→// de cursor. Sobre él, la coreografía tipográfica: BARDOS entra letra a letra
+     6→     6→// (rotateX + blur), se parte por la línea de corte roja, hard cut a negro →
+     7→     7→// BARBER. entra desde los costados (skew + blur + alternado) y se dispersa
+     8→     8→// al salir, mientras un marquee cinético desliza la geografía del local.
+     9→     9→// El primer scroll conduce la secuencia controlada (único scroll-jacking del sitio).
+    10→    10→// Capa 2-c: el video REACCIONA A LA VELOCIDAD del scroll (playbackRate vivo,
+    11→    11→// marquees con smear), REC + timecode, flicker de proyector y labels de letterbox.
+    12→    12→import { useEffect, useRef, useState } from "react";
+    13→    13→import {
+    14→    14→  motion,
+    15→    15→  useScroll,
+    16→    16→  useTransform,
+    17→    17→  useMotionValue,
+    18→    18→  useSpring,
+    19→    19→  useReducedMotion,
+    20→    20→  useMotionTemplate,
+    21→    21→  useVelocity,
+    22→    22→  type MotionValue,
+    23→    23→} from "framer-motion";
+    24→    24→import { BImage } from "./BImage";
+    25→    25→
+    26→    26→const LETTERS = ["B", "A", "R", "D", "O", "S"];
+    27→    27→const BARBER = ["B", "A", "R", "B", "E", "R"];
+    28→    28→const MARQUEE_LINE =
+    29→    29→  "SAN MARTÍN DE LOS ANDES — PATAGONIA — BARBERÍA — EST. MMXIX — EL CORTE COMO EDICIÓN — ";
+    30→    30→const MARQUEE_TOP = "BARDOS — BARBER — ";
+    31→    31→
+    32→    32→function vh(factor: number): number {
+    33→    33→  if (typeof window === "undefined") return 30 * factor;
+    34→    34→  return window.innerHeight * 0.04 * factor;
+    35→    35→}
+    36→    36→
+    37→    37→export function Opening() {
+    38→    38→  const sectionRef = useRef<HTMLElement>(null);
+    39→    39→  const videoRef = useRef<HTMLVideoElement>(null);
+    40→    40→  const [videoFailed, setVideoFailed] = useState(false);
+    41→    41→  const reduced = useReducedMotion();
+    42→    42→
+    43→    43→  const { scrollYProgress } = useScroll({
+    44→    44→    target: sectionRef,
+    45→    45→    offset: ["start start", "end end"],
+    46→    46→  });
+    47→    47→
+    48→    48→  /* --- L9 · (capa 2-c) la velocidad del scroll: el impulso del visitante --- */
+    49→    49→  const { scrollY } = useScroll();
+    50→    50→  const scrollVelocity = useVelocity(scrollY);
+    51→    51→
+    52→    52→  /* --- L1 · VIDEO: el encuadre vive con el scroll --- */
+    53→    53→  const videoScale = useTransform(scrollYProgress, [0, 0.5, 1], [1.32, 1, 1.14]);
+    54→    54→  const videoX = useTransform(scrollYProgress, [0, 1], ["-3.5vw", "3.5vw"]);
+    55→    55→  const videoRotate = useTransform(scrollYProgress, [0, 1], [-1.2, 1.2]);
+    56→    56→  const videoOpacity = useTransform(scrollYProgress, [0.3, 0.5], [0.55, 1]);
+    57→    57→  const overlayOpacity = useTransform(scrollYProgress, [0, 0.55], [1, 0.55]); // 45% → ~25%
+    58→    58→  const letterbox = useTransform(scrollYProgress, [0.5, 0.75], [0, 1]);
+    59→    59→
+    60→    60→  /* --- L2 · BARDOS: el corte abre la palabra --- */
+    61→    61→  const gap = useTransform(scrollYProgress, [0.28, 0.45], [0, 1]); // apertura de la palabra
+    62→    62→  const topShift = useTransform(gap, (g) => -vh(g));
+    63→    63→  const bottomShift = useTransform(gap, (g) => vh(g));
+    64→    64→  const lineScale = useTransform(scrollYProgress, [0.26, 0.4], [0, 1]);
+    65→    65→  const lineOpacity = useTransform(scrollYProgress, [0.24, 0.3, 0.5, 0.6], [0.9, 1, 1, 0]);
+    66→    66→  const wordOpacity = useTransform(scrollYProgress, [0.42, 0.55], [1, 0]);
+    67→    67→  const wordBlur = useTransform(scrollYProgress, [0.42, 0.55], [0, 8]);
+    68→    68→  const wordFilter = useMotionTemplate`blur(${wordBlur}px)`;
+    69→    69→
+    70→    70→  /* --- L3 · BARBER.: la tesis --- */
+    71→    71→  const thesisScale = useTransform(scrollYProgress, [0.55, 0.66], [1.05, 1]);
+    72→    72→  const serifOpacity = useTransform(scrollYProgress, [0.62, 0.68, 0.75, 0.8], [0, 1, 1, 0]);
+    73→    73→  const serifY = useTransform(scrollYProgress, [0.62, 0.72], [24, 0]);
+    74→    74→  const serifBlur = useTransform(scrollYProgress, [0.62, 0.72], [8, 0]);
+    75→    75→  const serifTracking = useTransform(scrollYProgress, [0.62, 0.72], ["0.3em", "0.04em"]);
+    76→    76→  const serifFilter = useMotionTemplate`blur(${serifBlur}px)`;
+    77→    77→
+    78→    78→  /* --- L4 · marquees cinéticos (textura de motion graphics) --- */
+    79→    79→  const marqueeX = useTransform(scrollYProgress, [0.5, 1], ["6%", "-34%"]);
+    80→    80→  const marqueeOpacity = useTransform(scrollYProgress, [0.58, 0.66, 0.85, 0.95], [0, 1, 1, 0]);
+    81→    81→  const marqueeTopX = useTransform(scrollYProgress, [0.5, 1], ["-20%", "4%"]);
+    82→    82→  const marqueeTopOpacity = useTransform(scrollYProgress, [0.6, 0.68, 0.82, 0.9], [0, 1, 1, 0]);
+    83→    83→
+    84→    84→  /* --- L7 · invitación al scroll --- */
+    85→    85→  const inviteOpacity = useTransform(scrollYProgress, [0.74, 0.82, 0.86, 0.9], [0, 1, 1, 0]);
+    86→    86→  const inviteScaleY = useTransform(scrollYProgress, [0.74, 0.88], [0, 1]);
+    87→    87→
+    88→    88→  /* --- L8 · hard cuts --- */
+    89→    89→  const blackFrame = useTransform(scrollYProgress, [0.46, 0.5, 0.54], [0, 1, 0]);
+    90→    90→  const outroBlack = useTransform(scrollYProgress, [0.92, 1], [0, 1]);
+    91→    91→
+    92→    92→  /* --- L9 · (capa 2-c) el video espeja la velocidad del scroll:
+    93→    93→     idle 0.55 → ráfaga hasta 2.2 (clamp), decae con lerp 0.12/frame.
+    94→    94→     Los marquees llevan el smear: skewX ±4° que se disipa al frenar. --- */
+    95→    95→  const videoRate = useRef({ rate: 0.55, target: 0.55, framer: 0, framerAt: 0 });
+    96→    96→  const marqueeSkew = useMotionValue(0);
+    97→    97→  const marqueeSkewTop = useTransform(marqueeSkew, (s) => -s);
+    98→    98→
+    99→    99→  /* --- letterbox labels: ocultos mientras la barra mide < 4% --- */
+   100→   100→  const barLabelOpacity = useTransform(letterbox, [0.44, 0.6], [0, 1]);
+   101→   101→
+   102→   102→  /* --- parallax (reacción a la presencia del cursor) --- */
+   103→   103→  const mx = useMotionValue(0.5);
+   104→   104→  const my = useMotionValue(0.5);
+   105→   105→  const sx = useSpring(mx, { stiffness: 60, damping: 18 });
+   106→   106→  const sy = useSpring(my, { stiffness: 60, damping: 18 });
+   107→   107→  const wordShiftX = useTransform(sx, [0, 1], [-12, 12]);
+   108→   108→  const wordShiftY = useTransform(sy, [0, 1], [-6, 6]);
+   109→   109→  const videoShiftX = useTransform(sx, [0, 1], [14, -14]);
+   110→   110→  const videoShiftY = useTransform(sy, [0, 1], [8, -8]);
+   111→   111→
+   112→   112→  const onPointer = (e: React.PointerEvent) => {
+   113→   113→    const r = (e.currentTarget as HTMLElement).getBoundingClientRect();
+   114→   114→    mx.set((e.clientX - r.left) / r.width);
+   115→   115→    my.set((e.clientY - r.top) / r.height);
+   116→   116→  };
+   117→   117→
+   118→   118→  /* --- ciclo de vida del video: slow-mo, autoplay tolerante a fallos --- */
+   119→   119→  useEffect(() => {
+   120→   120→    const v = videoRef.current;
+   121→   121→    if (!v || reduced) return;
+   122→   122→    v.muted = true;
+   123→   123→    v.playbackRate = 0.55; // cámara lenta quirúrgica (idle de la capa 2-c)
+   124→   124→    v.play().catch(() => {});
+   125→   125→  }, [reduced, videoFailed]);
+   126→   126→
+   127→   127→  /* --- pausa cuando la sección sale de viewport (performance) --- */
+   128→   128→  useEffect(() => {
+   129→   129→    const v = videoRef.current;
+   130→   130→    if (!v) return;
+   131→   131→    const io = new IntersectionObserver(
+   132→   132→      (entries) => {
+   133→   133→        const visible = entries[0]?.isIntersecting ?? false;
+   134→   134→        if (visible && !reduced) {
+   135→   135→          v.play().catch(() => {});
+   136→   136→        } else {
+   137→   137→          v.pause();
+   138→   138→        }
+   139→   139→      },
+   140→   140→      { threshold: 0 }
+   141→   141→    );
+   142→   142→    io.observe(v);
+   143→   143→    return () => io.disconnect();
+   144→   144→  }, [reduced, videoFailed]);
+   145→   145→
+   146→   146→  /* --- L9 · (capa 2-c) rAF único: playbackRate reactivo + smear de marquees.
+   147→   147→     Dos señales de velocidad, la mayor manda:
+   148→   148→     (a) useVelocity de framer — continua, ideal con Lenis animando cada frame;
+   149→   149→     (b) delta por-frame de scrollY — atrapa el salto brusco que framer
+   150→   150→         subestima (su dt interno abarca el reposo previo).
+   151→   151→     Sin estado React: ref para el rate, MotionValue para el skew, DOM directo. --- */
+   152→   152→  useEffect(() => {
+   153→   153→    const v = videoRef.current;
+   154→   154→    if (!v || reduced) return;
+   155→   155→
+   156→   156→    const state = videoRate.current;
+   157→   157→    let lastY = scrollY.get();
+   158→   158→    let lastNow = performance.now();
+   159→   159→    let velEma = 0; // px/s, suavizado exponencial
+   160→   160→    let skew = 0;
+   161→   161→
+   162→   162→    const unsub = scrollVelocity.on("change", (vel) => {
+   163→   163→      state.framer = Math.abs(vel); // última señal continua (px/s)
+   164→   164→      state.framerAt = performance.now();
+   165→   165→    });
+   166→   166→
+   167→   167→    let raf = 0;
+   168→   168→    const tick = () => {
+   169→   169→      const now = performance.now();
+   170→   170→      const dt = Math.max(now - lastNow, 1) / 1000; // s, jamás 0
+   171→   171→      const y = scrollY.get();
+   172→   172→
+   173→   173→      // (b) velocidad por-frame + suavizado (decae sola al frenar)
+   174→   174→      const rawVel = (y - lastY) / dt;
+   175→   175→      velEma = velEma * 0.8 + rawVel * 0.2;
+   176→   176→      lastY = y;
+   177→   177→      lastNow = now;
+   178→   178→
+   179→   179→      // señal de framer considerada viva solo si es reciente
+   180→   180→      if (now - state.framerAt > 300) state.framer = 0;
+   181→   181→
+   182→   182→      // |vel| → playbackRate: idle 0.55, tope 2.2 (≈2000 px/s = ráfaga)
+   183→   183→      const mag = Math.max(state.framer, Math.abs(velEma));
+   184→   184→      state.target = Math.min(0.55 + (mag / 2000) * 1.65, 2.2);
+   185→   185→      state.rate += (state.target - state.rate) * 0.12;
+   186→   186→      if (!v.paused && Math.abs(v.playbackRate - state.rate) > 0.001) {
+   187→   187→        v.playbackRate = state.rate;
+   188→   188→      }
+   189→   189→
+   190→   190→      // smear del marquee: ±4° con la velocidad (signada), decae con su lerp
+   191→   191→      const skewTarget = Math.max(-4, Math.min(4, velEma * 0.002));
+   192→   192→      skew += (skewTarget - skew) * 0.1;
+   193→   193→      marqueeSkew.set(skew);
+   194→   194→      raf = requestAnimationFrame(tick);
+   195→   195→    };
+   196→   196→    raf = requestAnimationFrame(tick);
+   197→   197→
+   198→   198→    return () => {
+   199→   199→      unsub();
+   200→   200→      cancelAnimationFrame(raf);
+   201→   201→      marqueeSkew.set(0);
+   202→   202→    };
+   203→   203→  }, [reduced, videoFailed, scrollVelocity, marqueeSkew, scrollY]);
+   204→   204→
+   205→   205→  return (
+   206→   206→    <section
+   207→   207→      id="opening"
+   208→   208→      ref={sectionRef}
+   209→   209→      onPointerMove={onPointer}
+   210→   210→      className={`relative ${reduced ? "h-screen" : "h-[380vh]"}`}
+   211→   211→      aria-label="Bardos — apertura"
+   212→   212→    >
+   213→   213→      <div className="sticky top-0 h-screen w-full overflow-hidden bg-black">
+   214→   214→        {/* --- L1 · FONDO: el video macro, encuadre vivo --- */}
+   215→   215→        <motion.div
+   216→   216→          className="absolute inset-0 vignette will-change-transform"
+   217→   217→          style={{
+   218→   218→            opacity: reduced ? 1 : videoOpacity,
+   219→   219→            scale: reduced ? 1 : videoScale,
+   220→   220→            x: reduced ? 0 : videoX,
+   221→   221→            rotate: reduced ? 0 : videoRotate,
+   222→   222→          }}
+   223→   223→        >
+   224→   224→          <motion.div
+   225→   225→            className="absolute inset-0"
+   226→   226→            style={{ x: reduced ? 0 : videoShiftX, y: reduced ? 0 : videoShiftY }}
+   227→   227→          >
+   228→   228→            {reduced || videoFailed ? (
+   229→   229→              <BImage
+   230→   230→                src="/images/hero-portrait.webp"
+   231→   231→                alt="Retrato editorial de un cliente Bardos: corte fresco, flash directo, sombra dura"
+   232→   232→                fill
+   233→   233→                priority
+   234→   234→                sizes="100vw"
+   235→   235→                imgClassName="object-cover object-center"
+   236→   236→              />
+   237→   237→            ) : (
+   238→   238→              <video
+   239→   239→                ref={videoRef}
+   240→   240→                src="/videos/hero.mp4"
+   241→   241→                poster="/images/hero-portrait.webp"
+   242→   242→                muted
+   243→   243→                loop
+   244→   244→                playsInline
+   245→   245→                preload="auto"
+   246→   246→                onError={() => setVideoFailed(true)}
+   247→   247→                aria-hidden="true"
+   248→   248→                className="b-img h-full w-full object-cover object-center"
+   249→   249→              />
+   250→   250→            )}
+   251→   251→          </motion.div>
+   252→   252→
+   253→   253→          {/* velo de legibilidad: se aclara a medida que el corte abre el plano */}
+   254→   254→          <motion.div
+   255→   255→            aria-hidden="true"
+   256→   256→            className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/45 to-black/30"
+   257→   257→            style={{ opacity: reduced ? 0.35 : overlayOpacity }}
+   258→   258→          />
+   259→   259→
+   260→   260→          {/* letterbox: el fotograma se aprieta al profundizar */}
+   261→   261→          <motion.span
+   262→   262→            aria-hidden="true"
+   263→   263→            className="absolute inset-x-0 top-0 block h-[9%] bg-black"
+   264→   264→            style={{ scaleY: reduced ? 1 : letterbox, transformOrigin: "top" }}
+   265→   265→          />
+   266→   266→          <motion.span
+   267→   267→            aria-hidden="true"
+   268→   268→            className="absolute inset-x-0 bottom-0 block h-[9%] bg-black"
+   269→   269→            style={{ scaleY: reduced ? 1 : letterbox, transformOrigin: "bottom" }}
+   270→   270→          />
+   271→   271→
+   272→   272→          {/* labels del letterbox (capa 2-c): la copia y el origen, dentro del fotograma */}
+   273→   273→          <motion.span
+   274→   274→            aria-hidden="true"
+   275→   275→            className="type-micro absolute inset-x-0 top-0 z-[1] flex h-[9%] items-center text-bone/60"
+   276→   276→            style={{ opacity: reduced ? 1 : barLabelOpacity, paddingInline: "var(--grid-margin)" }}
+   277→   277→          >
+   278→   278→            BARDOS — MMXXVI
+   279→   279→          </motion.span>
+   280→   280→          <motion.span
+   281→   281→            aria-hidden="true"
+   282→   282→            className="type-micro absolute inset-x-0 bottom-0 z-[1] flex h-[9%] items-center justify-end text-bone/60"
+   283→   283→            style={{ opacity: reduced ? 1 : barLabelOpacity, paddingInline: "var(--grid-margin)" }}
+   284→   284→          >
+   285→   285→            SAN MARTÍN DE LOS ANDES — PATAGONIA
+   286→   286→          </motion.span>
+   287→   287→        </motion.div>
+   288→   288→
+   289→   289→        {/* --- L9 · flicker de proyector (capa 2-c): la proyección respira,
+   290→   290→             sobre el video, bajo el texto — jamás strobe (máx 0.05) --- */}
+   291→   291→        {!reduced && <div aria-hidden="true" className="projector-flicker z-[2]" />}
+   292→   292→
+   293→   293→        {/* --- L9 · REC + timecode (capa 2-c): metadata viva del fotograma --- */}
+   294→   294→        <RecCluster progress={scrollYProgress} videoRef={videoRef} reduced={reduced} />
+   295→   295→
+   296→   296→        {/* --- L4 · marquee cinético: la geografía desliza con el scroll --- */}
+   297→   297→        {reduced ? (
+   298→   298→          <div className="marquee-mask absolute inset-x-0 top-[76px] z-[5] overflow-hidden">
+   299→   299→            <div className="flex w-max whitespace-nowrap">
+   300→   300→              <span className="type-micro text-bone/45">{MARQUEE_LINE}</span>
+   301→   301→            </div>
+   302→   302→          </div>
+   303→   303→        ) : (
+   304→   304→          <>
+   305→   305→            <motion.div
+   306→   306→              className="marquee-mask absolute inset-x-0 top-[72%] z-[5] overflow-hidden"
+   307→   307→              style={{ opacity: marqueeOpacity }}
+   308→   308→            >
+   309→   309→              <motion.div
+   310→   310→                className="marquee-smear flex w-max whitespace-nowrap"
+   311→   311→                style={{ x: marqueeX, skewX: marqueeSkew }}
+   312→   312→              >
+   313→   313→                <span className="type-micro text-bone/45">{MARQUEE_LINE.repeat(3)}</span>
+   314→   314→              </motion.div>
+   315→   315→            </motion.div>
+   316→   316→            <motion.div
+   317→   317→              className="marquee-mask absolute inset-x-0 top-[76px] z-[5] hidden overflow-hidden md:block"
+   318→   318→              style={{ opacity: marqueeTopOpacity }}
+   319→   319→            >
+   320→   320→              <motion.div
+   321→   321→                className="marquee-smear flex w-max whitespace-nowrap"
+   322→   322→                style={{ x: marqueeTopX, skewX: marqueeSkewTop }}
+   323→   323→              >
+   324→   324→                <span className="type-micro text-bone/30">{MARQUEE_TOP.repeat(12)}</span>
+   325→   325→              </motion.div>
+   326→   326→            </motion.div>
+   327→   327→          </>
+   328→   328→        )}
+   329→   329→
+   330→   330→        {/* --- L2 · LA PALABRA, partida en dos mitades --- */}
+   331→   331→        <motion.div
+   332→   332→          className="absolute inset-0 z-10 flex items-center justify-center"
+   333→   333→          style={{
+   334→   334→            opacity: reduced ? 1 : wordOpacity,
+   335→   335→            x: reduced ? 0 : wordShiftX,
+   336→   336→            y: reduced ? "-15vh" : wordShiftY,
+   337→   337→            filter: reduced ? undefined : wordFilter,
+   338→   338→          }}
+   339→   339→        >
+   340→   340→          <div className="relative select-none" aria-label="BARDOS" style={{ perspective: 900 }}>
+   341→   341→            <span aria-hidden="true" className="block">
+   342→   342→              <HalfWord clip="inset(0 0 50% 0)" y={reduced ? undefined : topShift} sx={sx} reduced={reduced} />
+   343→   343→            </span>
+   344→   344→            <span aria-hidden="true" className="absolute inset-0 block">
+   345→   345→              <HalfWord clip="inset(50% 0 0 0)" y={reduced ? undefined : bottomShift} sx={sx} reduced={reduced} />
+   346→   346→            </span>
+   347→   347→
+   348→   348→            {/* la línea de corte (firma visual) */}
+   349→   349→            <motion.span
+   350→   350→              aria-hidden="true"
+   351→   351→              className="cut-line absolute left-0 top-1/2"
+   352→   352→              style={{ scaleX: reduced ? 1 : lineScale, opacity: reduced ? 1 : lineOpacity }}
+   353→   353→            />
+   354→   354→          </div>
+   355→   355→        </motion.div>
+   356→   356→
+   357→   357→        {/* --- L3 · LA TESIS: BARBER. --- */}
+   358→   358→        <motion.div
+   359→   359→          className="absolute inset-0 z-10 flex flex-col items-center justify-center"
+   360→   360→          style={{ scale: reduced ? 1 : thesisScale, y: reduced ? "12vh" : 0 }}
+   361→   361→        >
+   362→   362→          <h1
+   363→   363→            aria-label="BARBER."
+   364→   364→            className="font-display font-display-tight type-display-md px-4 text-center text-offwhite"
+   365→   365→          >
+   366→   366→            <span aria-hidden="true" className="flex items-baseline justify-center will-change-transform">
+   367→   367→              {BARBER.map((l, i) => (
+   368→   368→                <BarberLetter key={i} char={l} index={i} progress={scrollYProgress} reduced={reduced} />
+   369→   369→              ))}
+   370→   370→              <BarberDot progress={scrollYProgress} reduced={reduced} />
+   371→   371→            </span>
+   372→   372→          </h1>
+   373→   373→          <motion.p
+   374→   374→            className="font-editorial-italic mt-4 px-6 text-center text-[clamp(18px,2.4vw,30px)] text-chalk/90 sm:mt-6"
+   375→   375→            style={{
+   376→   376→              opacity: reduced ? 1 : serifOpacity,
+   377→   377→              y: reduced ? 0 : serifY,
+   378→   378→              letterSpacing: reduced ? "0.04em" : serifTracking,
+   379→   379→              filter: reduced ? undefined : serifFilter,
+   380→   380→            }}
+   381→   381→          >
+   382→   382→            Cortar es quitar.
+   383→   383→          </motion.p>
+   384→   384→        </motion.div>
+   385→   385→
+   386→   386→        {/* --- L5 · slates de esquina: metadata del fotograma --- */}
+   387→   387→        <CornerSlate index={0} progress={scrollYProgress} reduced={reduced} className="left-0 top-24">
+   388→   388→          BARDOS® — MMXXVI
+   389→   389→        </CornerSlate>
+   390→   390→        <CornerSlate index={1} progress={scrollYProgress} reduced={reduced} className="right-0 top-24 text-right">
+   391→   391→          SAN MARTÍN DE LOS ANDES
+   392→   392→        </CornerSlate>
+   393→   393→        <CornerSlate index={2} progress={scrollYProgress} reduced={reduced} className="bottom-28 left-0">
+   394→   394→          PATAGONIA — ARGENTINA
+   395→   395→        </CornerSlate>
+   396→   396→        <CornerSlate index={3} progress={scrollYProgress} reduced={reduced} className="bottom-28 right-0 text-right">
+   397→   397→          ESCENA 01 — ENTRADA
+   398→   398→        </CornerSlate>
+   399→   399→
+   400→   400→        {/* --- L7 · invitación al scroll: la línea que corta hacia abajo --- */}
+   401→   401→        <motion.div
+   402→   402→          className="absolute bottom-10 left-1/2 z-10 flex -translate-x-1/2 flex-col items-center gap-4"
+   403→   403→          style={{ opacity: reduced ? 1 : inviteOpacity }}
+   404→   404→        >
+   405→   405→          <motion.span
+   406→   406→            className="type-micro text-bone"
+   407→   407→            animate={reduced ? undefined : { opacity: [0.55, 1, 0.55] }}
+   408→   408→            transition={{ duration: 2.4, repeat: Infinity, ease: "easeInOut" }}
+   409→   409→          >
+   410→   410→            DESLIZÁ
+   411→   411→          </motion.span>
+   412→   412→          <motion.span
+   413→   413→            className="block w-[1px] bg-red"
+   414→   414→            style={{ height: 56, scaleY: reduced ? 1 : inviteScaleY, transformOrigin: "top" }}
+   415→   415→          />
+   416→   416→        </motion.div>
+   417→   417→
+   418→   418→        {/* --- L8 · hard cut con frame negro (1-2 frames) + fundido final del acto --- */}
+   419→   419→        {!reduced && (
+   420→   420→          <>
+   421→   421→            <motion.div aria-hidden="true" className="pointer-events-none absolute inset-0 z-20 bg-black" style={{ opacity: blackFrame }} />
+   422→   422→            <motion.div aria-hidden="true" className="pointer-events-none absolute inset-0 z-20 bg-black" style={{ opacity: outroBlack }} />
+   423→   423→          </>
+   424→   424→        )}
+   425→   425→
+   426→   426→        {/* --- L6 · metadata claqueta (secuencia temporizada de apertura) --- */}
+   427→   427→        {!reduced && <IntroMeta />}
+   428→   428→      </div>
+   429→   429→    </section>
+   430→   430→  );
+   431→   431→}
+   432→   432→
+   433→   433→/** Secuencia de apertura temporizada (00:00 → 00:03): slate, hairline y metadata. */
+   434→   434→function IntroMeta() {
+   435→   435→  const [done, setDone] = useState(false);
+   436→   436→  useEffect(() => {
+   437→   437→    const t = setTimeout(() => setDone(true), 2600);
+   438→   438→    return () => clearTimeout(t);
+   439→   439→  }, []);
+   440→   440→
+   441→   441→  return (
+   442→   442→    <>
+   443→   443→      <motion.div
+   444→   444→        className="absolute inset-x-0 top-24 hidden justify-between md:top-28 md:flex"
+   445→   445→        style={{ paddingInline: "var(--grid-margin)" }}
+   446→   446→        initial={{ opacity: 0 }}
+   447→   447→        animate={{ opacity: done ? 0 : 0.9 }}
+   448→   448→        transition={{ duration: 1 }}
+   449→   449→      >
+   450→   450→        <span className="type-micro text-bone">SAN MARTÍN DE LOS ANDES</span>
+   451→   451→        <span className="type-micro text-smoke">EST. MMXIX</span>
+   452→   452→      </motion.div>
+   453→   453→
+   454→   454→      {/* hairline roja latiendo en el silencio inicial */}
+   455→   455→      <motion.div
+   456→   456→        aria-hidden="true"
+   457→   457→        className="cut-line absolute left-1/2 top-1/2 z-10 -translate-x-1/2"
+   458→   458→        style={{ width: 48 }}
+   459→   459→        initial={{ scaleX: 0.2, opacity: 0 }}
+   460→   460→        animate={done ? { opacity: 0 } : { scaleX: [0.2, 1, 0.55], opacity: 1 }}
+   461→   461→        transition={{ duration: 2.4, ease: [0.85, 0, 0.15, 1] }}
+   462→   462→      />
+   463→   463→
+   464→   464→      {/* slate inicial */}
+   465→   465→      <motion.div
+   466→   466→        className="absolute left-1/2 top-[38%] z-10 -translate-x-1/2"
+   467→   467→        initial={{ opacity: 0, y: 8 }}
+   468→   468→        animate={done ? { opacity: 0, y: 8 } : { opacity: 1, y: 0 }}
+   469→   469→        transition={{ duration: 0.8, delay: 0.4, ease: [0.16, 1, 0.3, 1] }}
+   470→   470→      >
+   471→   471→        <p className="type-micro text-bone">BARDOS / SAN MARTÍN DE LOS ANDES / MMXXVI</p>
+   472→   472→      </motion.div>
+   473→   473→    </>
+   474→   474→  );
+   475→   475→}
+   476→   476→
+   477→   477→/**
+   478→   478→ * REC + timecode (capa 2-c): metadata viva del fotograma.
+   479→   479→ * El TC sigue video.currentTime a 30fps (HH:MM:SS:FF) con mutación DOM
+   480→   480→ * directa (ref.textContent) — cero re-renders de React. Entra con el intro
+   481→   481→ * (~1.2s) y se apaga con la salida de la tesis (~0.75 del scroll).
+   482→   482→ * En reduced-motion: "REC ●" + "TC —" estáticos, sin rAF.
+   483→   483→ */
+   484→   484→function RecCluster({
+   485→   485→  progress,
+   486→   486→  videoRef,
+   487→   487→  reduced,
+   488→   488→}: {
+   489→   489→  progress: MotionValue<number>;
+   490→   490→  videoRef: React.RefObject<HTMLVideoElement | null>;
+   491→   491→  reduced: boolean | null;
+   492→   492→}) {
+   493→   493→  const tcRef = useRef<HTMLSpanElement>(null);
+   494→   494→  const exitOpacity = useTransform(progress, [0.7, 0.78], [1, 0]);
+   495→   495→
+   496→   496→  useEffect(() => {
+   497→   497→    if (reduced) return;
+   498→   498→    const pad = (n: number) => String(n).padStart(2, "0");
+   499→   499→    let raf = 0;
+   500→   500→    const tick = () => {
+   501→   501→      const el = tcRef.current;
+   502→   502→      const v = videoRef.current;
+   503→   503→      if (el) {
+   504→   504→        if (v) {
+   505→   505→          const t = v.currentTime;
+   506→   506→          const frames = Math.floor((t % 1) * 30);
+   507→   507→          el.textContent = `TC ${pad(Math.floor(t / 3600))}:${pad(Math.floor(t / 60) % 60)}:${pad(Math.floor(t) % 60)}:${pad(frames)}`;
+   508→   508→        } else if (el.textContent !== "TC —") {
+   509→   509→          el.textContent = "TC —"; // sin señal: el poster no corre
+   510→   510→        }
+   511→   511→      }
+   512→   512→      raf = requestAnimationFrame(tick);
+   513→   513→    };
+   514→   514→    raf = requestAnimationFrame(tick);
+   515→   515→    return () => cancelAnimationFrame(raf);
+   516→   516→  }, [reduced, videoRef]);
+   517→   517→
+   518→   518→  const cluster = "type-micro absolute right-0 top-[76px] z-[6] flex items-center gap-2";
+   519→   519→  const clusterStyle = { paddingInline: "var(--grid-margin)" };
+   520→   520→
+   521→   521→  if (reduced) {
+   522→   522→    return (
+   523→   523→      <div aria-hidden="true" className={cluster} style={clusterStyle}>
+   524→   524→        <span className="rec-dot" />
+   525→   525→        <span className="text-bone">REC</span>
+   526→   526→        <span className="text-bone/60">TC —</span>
+   527→   527→      </div>
+   528→   528→    );
+   529→   529→  }
+   530→   530→
+   531→   531→  return (
+   532→   532→    <motion.div
+   533→   533→      aria-hidden="true"
+   534→   534→      className={cluster}
+   535→   535→      style={clusterStyle}
+   536→   536→      initial={{ opacity: 0 }}
+   537→   537→      animate={{ opacity: 1 }}
+   538→   538→      transition={{ delay: 1.2, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+   539→   539→    >
+   540→   540→      <motion.span className="flex items-center gap-2" style={{ opacity: exitOpacity }}>
+   541→   541→        <span className="rec-dot" />
+   542→   542→        <span className="text-bone">REC</span>
+   543→   543→        <span ref={tcRef} className="text-bone/60 tabular-nums">
+   544→   544→          TC 00:00:00:00
+   545→   545→        </span>
+   546→   546→      </motion.span>
+   547→   547→    </motion.div>
+   548→   548→  );
+   549→   549→}
+   550→   550→
+   551→   551→/** Una mitad de la palabra con clip-path; letras con micro-parallax individual. */
+   552→   552→function HalfWord({
+   553→   553→  clip,
+   554→   554→  y,
+   555→   555→  sx,
+   556→   556→  reduced,
+   557→   557→}: {
+   558→   558→  clip: string;
+   559→   559→  y?: MotionValue<number>;
+   560→   560→  sx: MotionValue<number>;
+   561→   561→  reduced: boolean | null;
+   562→   562→}) {
+   563→   563→  return (
+   564→   564→    <motion.span
+   565→   565→      className="font-display font-display-tight type-display block whitespace-nowrap text-offwhite"
+   566→   566→      style={{ clipPath: clip, y }}
+   567→   567→    >
+   568→   568→      <span className="flex" style={{ perspective: 900 }}>
+   569→   569→        {LETTERS.map((l, i) => (
+   570→   570→          <Letter key={i} char={l} index={i} sx={sx} reduced={reduced} />
+   571→   571→        ))}
+   572→   572→      </span>
+   573→   573→    </motion.span>
+   574→   574→  );
+   575→   575→}
+   576→   576→
+   577→   577→function Letter({
+   578→   578→  char,
+   579→   579→  index,
+   580→   580→  sx,
+   581→   581→  reduced,
+   582→   582→}: {
+   583→   583→  char: string;
+   584→   584→  index: number;
+   585→   585→  sx: MotionValue<number>;
+   586→   586→  reduced: boolean | null;
+   587→   587→}) {
+   588→   588→  const center = (index + 0.5) / LETTERS.length;
+   589→   589→  const parallaxY = useTransform(sx, [0, center, 1], [5, -4, 5]);
+   590→   590→
+   591→   591→  if (reduced) {
+   592→   592→    return <span className="inline-block">{char}</span>;
+   593→   593→  }
+   594→   594→
+   595→   595→  return (
+   596→   596→    <motion.span style={{ y: parallaxY }} className="inline-block">
+   597→   597→      <motion.span
+   598→   598→        className="inline-block"
+   599→   599→        style={{ transformPerspective: 900 }}
+   600→   600→        initial={{ y: "0.65em", opacity: 0, rotateX: 55, filter: "blur(12px)" }}
+   601→   601→        animate={{ y: 0, opacity: 1, rotateX: 0, filter: "blur(0px)" }}
+   602→   602→        transition={{ delay: 0.9 + index * 0.07, duration: 1, ease: [0.16, 1, 0.3, 1] }}
+   603→   603→      >
+   604→   604→        {char}
+   605→   605→      </motion.span>
+   606→   606→    </motion.span>
+   607→   607→  );
+   608→   608→}
+   609→   609→
+   610→   610→/**
+   611→   611→ * Letra de BARBER. — coreografía scroll-driven:
+   612→   612→ * ENTRADA [0.55 + i·0.025, +0.07]: vuela desde su costado (x ±90, skewX ∓14, blur 10→0).
+   613→   613→ * SALIDA [0.74 + i·0.02, +0.09]: se dispersa arriba/abajo (y ∓110/+130, rotate ±6, blur 6).
+   614→   614→ */
+   615→   615→function BarberLetter({
+   616→   616→  char,
+   617→   617→  index,
+   618→   618→  progress,
+   619→   619→  reduced,
+   620→   620→}: {
+   621→   621→  char: string;
+   622→   622→  index: number;
+   623→   623→  progress: MotionValue<number>;
+   624→   624→  reduced: boolean | null;
+   625→   625→}) {
+   626→   626→  const fromLeft = index % 2 === 0;
+   627→   627→  const tIn = 0.55 + index * 0.025;
+   628→   628→  const tInEnd = tIn + 0.07;
+   629→   629→  const tOut = 0.74 + index * 0.02;
+   630→   630→  const tOutEnd = tOut + 0.09;
+   631→   631→
+   632→   632→  const x = useTransform(progress, [tIn, tInEnd], [fromLeft ? -90 : 90, 0]);
+   633→   633→  const y = useTransform(progress, [tOut, tOutEnd], [0, fromLeft ? -110 : 130]);
+   634→   634→  const skewX = useTransform(progress, [tIn, tInEnd], [fromLeft ? -14 : 14, 0]);
+   635→   635→  const rotate = useTransform(progress, [tOut, tOutEnd], [0, fromLeft ? -6 : 6]);
+   636→   636→  const opacity = useTransform(progress, [tIn, tInEnd, tOut, tOutEnd], [0, 1, 1, 0]);
+   637→   637→  const blur = useTransform(progress, [tIn, tInEnd, tOut, tOutEnd], [10, 0, 0, 6]);
+   638→   638→
+   639→   639→  const transform = useMotionTemplate`translateX(${x}px) translateY(${y}px) rotate(${rotate}deg) skewX(${skewX}deg)`;
+   640→   640→  const filter = useMotionTemplate`blur(${blur}px)`;
+   641→   641→
+   642→   642→  if (reduced) {
+   643→   643→    return <span className="inline-block">{char}</span>;
+   644→   644→  }
+   645→   645→
+   646→   646→  return (
+   647→   647→    <motion.span className="inline-block" style={{ transform, opacity, filter }}>
+   648→   648→      {char}
+   649→   649→    </motion.span>
+   650→   650→  );
+   651→   651→}
+   652→   652→
+   653→   653→/** El punto rojo: punch-in quirúrgico al final de la entrada de la palabra. */
+   654→   654→function BarberDot({
+   655→   655→  progress,
+   656→   656→  reduced,
+   657→   657→}: {
+   658→   658→  progress: MotionValue<number>;
+   659→   659→  reduced: boolean | null;
+   660→   660→}) {
+   661→   661→  const scale = useTransform(progress, [0.7, 0.74, 0.8, 0.88], [2.6, 1, 1, 1.25]);
+   662→   662→  const opacity = useTransform(progress, [0.7, 0.74, 0.8, 0.88], [0, 1, 1, 0]);
+   663→   663→
+   664→   664→  if (reduced) {
+   665→   665→    return <span className="inline-block text-red">.</span>;
+   666→   666→  }
+   667→   667→
+   668→   668→  return (
+   669→   669→    <motion.span className="inline-block text-red" style={{ scale, opacity }}>
+   670→   670→      .
+   671→   671→    </motion.span>
+   672→   672→  );
+   673→   673→}
+   674→   674→
+   675→   675→/** Caption de esquina: entra tras el slate y deriva con el scroll. */
+   676→   676→function CornerSlate({
+   677→   677→  index,
+   678→   678→  progress,
+   679→   679→  reduced,
+   680→   680→  className,
+   681→   681→  children,
+   682→   682→}: {
+   683→   683→  index: number;
+   684→   684→  progress: MotionValue<number>;
+   685→   685→  reduced: boolean | null;
+   686→   686→  className: string;
+   687→   687→  children: React.ReactNode;
+   688→   688→}) {
+   689→   689→  const drift = useTransform(progress, [0, 1], [
+   690→   690→    index % 2 === 0 ? -18 : 18,
+   691→   691→    index % 2 === 0 ? 18 : -18,
+   692→   692→  ]);
+   693→   693→
+   694→   694→  return (
+   695→   695→    <motion.div
+   696→   696→      className={`type-micro absolute z-10 hidden text-bone/70 sm:block ${className}`}
+   697→   697→      style={{ y: reduced ? 0 : drift, paddingInline: "var(--grid-margin)" }}
+   698→   698→      initial={{ opacity: 0 }}
+   699→   699→      animate={{ opacity: reduced ? 1 : 0.9 }}
+   700→   700→      transition={
+   701→   701→        reduced
+   702→   702→          ? { duration: 0 }
+   703→   703→          : { delay: 1.2 + index * 0.15, duration: 0.8, ease: [0.16, 1, 0.3, 1] }
+   704→   704→      }
+   705→   705→    >
+   706→   706→      {children}
+   707→   707→    </motion.div>
+   708→   708→  );
+   709→   709→}
+   710→   710→

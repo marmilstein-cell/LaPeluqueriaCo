@@ -1,0 +1,46 @@
+SKIP artist-santi
+SKIP hero-portrait
+SKIP artist-valo
+SKIP artist-nico
+SKIP artist-rama
+SKIP client-older
+SKIP client-curly
+SKIP craft-clippers
+SKIP craft-scissors
+SKIP craft-razor
+SKIP craft-foam
+SKIP craft-fade
+SKIP space-chair
+FAIL space-wide
+SKIP space-night
+SKIP space-mirror
+SKIP service-cut
+OK service-beard (attempt 1)
+OK service-color (attempt 1)
+OK service-treatment (attempt 1)
+OK og-cover (attempt 1)
+OK service-ritual (attempt 1)
+=== FINAL ===
+      1 === FINAL ===
+      1 FAIL space-wide
+      1 OK og-cover (attempt 1)
+      1 OK service-beard (attempt 1)
+      1 OK service-color (attempt 1)
+      1 OK service-ritual (attempt 1)
+      1 OK service-treatment (attempt 1)
+      1 SKIP artist-nico
+      1 SKIP artist-rama
+      1 SKIP artist-santi
+      1 SKIP artist-valo
+      1 SKIP client-curly
+      1 SKIP client-older
+      1 SKIP craft-clippers
+      1 SKIP craft-fade
+      1 SKIP craft-foam
+      1 SKIP craft-razor
+      1 SKIP craft-scissors
+      1 SKIP hero-portrait
+      1 SKIP service-cut
+      1 SKIP space-chair
+      1 SKIP space-mirror
+      1 SKIP space-night

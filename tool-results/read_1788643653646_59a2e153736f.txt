@@ -1,0 +1,388 @@
+     1→# BARDOS BARBER — Worklog de construcción
+     2→
+     3→Proyecto: experiencia digital de Bardos Barber (Buenos Aires).
+     4→Documento rector: `upload/Pasted Content_1788625181909.txt` (Master Creative Directive).
+     5→Stack: Next.js 16 App Router + TS + Tailwind 4 + Framer Motion + Lenis + Zustand + Prisma/SQLite.
+     6→Restricción de entorno: todo vive en la ruta única `/` → navegación por escenas con hash (`#home`, `#the-cut`, `#artists`, `#craft`, `#space`, `#book`, `#session/BRD-XXXX`), que cumple el requisito de "rutas reales compartibles" dentro de lo que el sandbox permite. APIs REST reales para booking.
+     7→
+     8→---
+     9→Task ID: 0
+    10→Agent: main (Z.ai Code)
+    11→Task: Fase 0 — Resolución creativa sin código (entregables a, b, c, d, e, f del Apéndice B)
+    12→
+    13→Work Log:
+    14→- Leí el documento maestro completo (738 líneas) y extraje: tesis (EL CORTE COMO ACTO DE EDICIÓN / CUT THE NOISE), ADN (RAW × PRECISE × CULTURAL × CINEMATIC × HUMAN), dirección (THE CUT × THE FILM × THE CLUB), motion grammar (9 verbos), anti-cliché system, data model del booking.
+    15→- Resuelvo los entregables obligatorios de Fase 0 (el usuario pidió explícitamente ir al máximo y terminar todo, por lo que las fases se aprueban en línea con la tesis y se documentan acá):
+    16→
+    17→(a) COLOR DE ACENTO — 3 candidatos evaluados:
+    18→  1. Rojo quirúrgico #E5231B — GANADOR. Justificación: el rojo es EL color del oficio (el barber pole rojo = sangre/cirugía, los barberos fueron cirujanos); es narrativamente preciso ("aparece solo cuando algo fue elegido/cortado"); clínico + crudo a la vez (RAW × PRECISE); cinematográfico (Kubrick); no es violeta-celeste AI, no es negro+dorado.
+    19→  2. Verde ácido #C8FF3D — rechazado: alto riesgo, remite a startup tech, contamina la neutralidad mineral.
+    20→  3. Azul eléctrico #1B2A6B — rechazado: riesgo de caer en el look "gradiente violeta-celeste = hecho con IA" que la sección 18 prohíbe.
+    21→  Neutrales ajustados: acento cálido → negros/grises tiran a frío. Black #0A0A0B, off-white #F4F2EC (papel, para editorial), grises minerales fríos.
+    22→
+    23→(b) TIPOGRAFÍA — 3 roles, licencia cero, performance (next/font + swap):
+    24→  - DISPLAY = Archivo (variable, axis wdth 62–125; uso expandido 125% + weight 800/900). Equivalente libre de PP Monument Extended: grotesca expandida, arquitectónica, agresiva. Rellena viewport como cartel de film.
+    25→  - EDITORIAL = Instrument Serif (400 + italic). Serif contemporánea afilada, para narrativa (THE CUT, THE WORLD) con itálicas editoriales gigantes.
+    26→  - SYSTEM = IBM Plex Mono (400/500). Catálogo técnico para booking, precios, horarios, metadata. El booking nunca sacrifica legibilidad.
+    27→  - Inter descartado explícitamente (regla 04.3).
+    28→
+    29→(c) FIRMA VISUAL DE MARCA (test: screenshot sin logo → reconocible):
+    30→  1. LA LÍNEA DE CORTE: hairline roja quirúrgica que "corta" composiciones (bordes de palabras, fotos, el track de selección). Es el gesto tipográfico-gráfico reiterado.
+    31→  2. Tipografía display expandida a escala brutal (palabras que atraviesan el viewport) recortadas por crops.
+    32→  3. Capa de metadata en mono estilo claqueta/película persistente (BARDOS / BUENOS AIRES / escena / hora).
+    33→  4. Cut negro de 1 frame entre escenas mayores + grain fotográfico global.
+    34→  5. El rojo como señal narrativa: aparece SOLO con la selección/decisión (servicio, artista, confirmación — ahí explota).
+    35→
+    36→(d) IDIOMA — decisión explícita: inglés para momentos de impacto de marca (ya validados en el doc: BARDOS / THE CUT. / WHAT ARE WE CUTTING? / YOUR SESSION / SEE YOU AT BARDOS.), español rioplatense con voseo para toda la capa funcional (labels, validaciones, errores, cómo llegar, privacidad). Ej: "Elegí tu servicio", "Ese horario se cortó — estos son los más cercanos".
+    37→
+    38→(e) STORYBOARD OPENING (según modelo Apéndice A, con implementación):
+    39→  - 00:00 Entry: negro casi total, silencio visual, solo hairline roja latiendo 1px.
+    40→  - 00:01 First info: micro-mono "BARDOS / BUENOS AIRES / EST. MMXIX" aparece (FOCUS, 400ms).
+    41→  - 00:03 Brand reveal: "BARDOS" display expandida ocupa el viewport (REVEAL por mask, 700ms). Movimiento mínimo de DRIFT en fondo.
+    42→  - 00:05 Interacción: el cursor mueve → la palabra reacciona (parallax sutil por letra, MICRO).
+    43→  - 00:08 First cut: hairline roja atraviesa la palabra (SCALE en X, 300ms) → el corte desplaza la mitad inferior y detrás aparece fragmento fotográfico (retrato). CUT real con frame negro de 1 frame.
+    44→  - 00:12 Thesis: "THE CUT." aparece (SNAP).
+    45→  - 00:15 Invitación: línea vertical roja que "corta" hacia abajo, hint de scroll (no ícono de mouse).
+    46→  - Primer scroll → CONTROLLED: la sección pinned (~300vh) conduce la secuencia de corte final → hard cut a THE WORLD (Acto II). Único scroll-jacking del sitio.
+    47→
+    48→(f) TESIS CONFIRMADA: Bardos = película editorial interactiva sobre identidad y oficio, disfrazada de barbería. El corte como edición: cada decisión de diseño elimina antes que agregar. CUT THE NOISE.
+    49→
+    50→Stage Summary:
+    51→- Resolución creativa completa y aprobada internamente. Procedo a Fase 1 (design system) y construcción completa por actos, backend de booking con Prisma (validación server-side de slots para el edge case 08.10), ~20 imágenes AI con dirección de arte editorial B&W (flash directo, sombras duras, grain), Session Pass con URL hash real, WhatsApp wa.me, cancel/reschedule.
+    52→- Restricción de entorno registrada: única ruta visible `/` → escenas por hash + APIs REST. El Session Pass vive en `#session/BRD-XXXX` (URL real, re-abrible, compartible).
+    53→
+    54→---
+    55→Task ID: 1-8
+    56→Agent: main (Z.ai Code)
+    57→Task: Construcción completa — design system, backend de booking, escenas, Session Pass, assets AI, QA E2E
+    58→
+    59→Work Log:
+    60→- ASSETS (Task 1): 22 imágenes AI generadas (PEOPLE ×7, CRAFT ×5, SPACE ×4, SERVICES ×5, OG ×1) con dirección de arte editorial B&W (flash directo, sombras duras, grain) + 1 video cinematográfico 1920×1080 (cogvideox-3) para THE CRAFT. Pipeline sharp: PNG→WebP q84 + blur placeholders en src/lib/bardos/images-manifest.ts. Video con IntersectionObserver autoplay.
+    61→- DESIGN SYSTEM (Task 2): globals.css completo — tokens Fase 0 (negro #0A0A0B frío, off-white #F4F2EC papel, rojo quirúrgico #E5231B), 3 roles tipográficos (Archivo wdth 125 / Instrument Serif / IBM Plex Mono), firma visual (línea de corte, metadata claqueta, mask reveals), componentes base (b-btn, b-link, b-input, grain, marquee, slot-cut).
+    62→- BACKEND (Task 3): Prisma SQLite (Service, Artist, ArtistService, Booking). APIs REST: /api/catalog, /api/availability (disponibilidad computada = horarios − reservas, hora BA real via Intl), /api/bookings (POST con validación server-side, 409 + 2 alternativas más cercanas), /api/bookings/[id] (+/cancel, +/reschedule con cadena prevId). Seed: 5 servicios, 4 artistas (SANTI/VALO/NICO/RAMA), 18 vínculos.
+    63→- ESCENAS (Task 4): Opening (storyboard Apéndice A completo: pinned 340vh, palabra partida con hairline roja, frame negro de 1 frame, parallax por letra), The World (manifesto editorial con imágenes cortadas en el texto), The People (retratos editoriales + EL CLUB clientes), The Craft (video + macro grid con FR numbers), The Cut (REMOVE/REFINE/DEFINE/BECOME crecientes + lista de servicios con preview flotante que sigue al cursor), The Archive (marquee infinito + IG narrativo), The Space (datos integrados narrativamente: horarios catálogo, wide shot nocturno), Footer (créditos de película).
+    64→- BOOKING (Task 5): Session Builder de 6 pasos con composición dividida (panel izquierdo narrativo que cambia con la elección), tracker progresivo sticky, calendario para pulgar, slots en vivo (refetch 30s), validación en voz de marca voseada, privacidad honesta expandible, edge case 08.10 con tratamiento "se cortó" + alternativas clickeables. Session Pass: ceremonia (silencio→línea→SESSION CONFIRMED), ticket off-white con barcode determinista, URL real #session/BRD-XXXX, WhatsApp prellenado, ICS descargable, cancelar (2 pasos), reprogramar (mantiene servicio/artista), post-booking ANTES DE TU SESIÓN.
+    65→- QA E2E (Task 7, agent-browser): booking completo por UI (BRD-0247 creado = ID exacto del brief), reapertura por URL hash, cancelación, race condition 409 con alternativas verificada por API y UI, reschedule API, menú fullscreen, navegación por escenas, video autoplay, marquee, preview flotante, mobile 375px (hero + booking + touch targets).
+    66→
+    67→INCIDENTES RESUELTOS:
+    68→- Import nombrado vs default (BardosExperience) → "Element type is invalid" (bisecado hasta la causa raíz).
+    69→- git checkout -- fallido VACIÓ globals.css (0 bytes) → Tailwind sin utilities, imágenes colapsadas → reescritura completa.
+    70→- Background processes mueren al cerrar la sesión bash → generación de imágenes en foreground por lotes.
+    71→- z-ai API 429 con concurrencia 5 → lotes de 2 con backoff.
+    72→- Tamaños de imagen deben ser múltiplos de 32 (1440×720 inválido → 1344×768).
+    73→- Turbopack no resuelve .json por alias → manifest como módulo .ts.
+    74→
+    75→Stage Summary:
+    76→- SITIO COMPLETO Y VERIFICADO E2E. page 200, lint 0 errores, 22 imágenes + video servidos, booking engine funcional con base de datos real.
+    77→
+    78→---
+    79→Task ID: AUDIT
+    80→Agent: main (Z.ai Code)
+    81→Task: Self-critique loop obligatorio (sección 20 del brief) — parte del entregable
+    82→
+    83→AUDITORÍA DE AUTOCRÍTICA:
+    84→
+    85→1. Decisiones de diseño CONSIDERADAS Y RECHAZADAS:
+    86→- Cursor gigante con texto "VIEW" → rechazado (cliché explícito sección 18): implementado punto de 4px que solo cambia a rojo en interacción.
+    87→- Negro + dorado "premium" → rechazado: el lujo está en timing/espacio/fotografía (sección 24).
+    88→- GSAP + ScrollTrigger para el Opening → rechazado en favor de useScroll de framer-motion (menos dependencias, mismo resultado con sticky + scroll progress).
+    89→- Video hero autoplay en loop → rechazado (prohibido sin justificación narrativa): el video vive en THE CRAFT como "el proceso, sin edición", con IntersectionObserver.
+    90→- Grid de 3 features con íconos → rechazado: THE WORLD usa stats en mono estilo catálogo.
+    91→- Calendario tipo Calendly → rechazado: tira editorial de días con labels HOY/cut-line de selección.
+    92→
+    93→2. Tentaciones anti-cliché evitadas:
+    94→- Estuve tentado de agregar glow/gradients en el Session Pass para "hacerlo premium" → resuelto con off-white físico + sombra dura única + barcode.
+    95→- Tentación de animar todo → contención: 90% del motion es MICRO/REVEAL; IMPACT solo en: frame negro del corte, ceremony del pass, y la palabra BECOME (10% cumplido).
+    96→- Íconos de librería: cero íconos en todo el sitio (solo tipografía y la hairline roja).
+    97→
+    98→3. Puntaje honesto (1-10) sobre las cinco métricas de la sección 19:
+    99→- DESIRE: 9 — la capa emocional construye (retratos, macro, video del proceso) antes de la invitación fuerte a reservar; el Pass genera orgullo de objeto.
+   100→- DISCOVERY: 8 — el recorrido de actos + archive marquee invitan a seguir; el menú cinematográfico suma. No pongo 9 porque no hay contenido editorial profundo (blog/historia del local) que el brief menciona como THE ARCHIVE extendido.
+   101→- CLARITY: 9 — cada paso del builder dice qué hacer; el tracker permanente elimina ambigüedad; el pass explica cómo llegar/qué esperar.
+   102→- CONVERSION: 9 — reserva completa verificada E2E en <60s, BOOK siempre en nav, sugerencias desde THE CUT/THE PEOPLE pre-seleccionan. El edge case de slot caído ofrece alternativas a un click.
+   103→- MEMORY: 9 — firma visual verificable: screenshot sin logo = palabra partida + hairline roja + mono claqueta + pass off-white. "Cortar es quitar." es memorable.
+   104→- (Firma visual test: ¿reconocible sin logo? SÍ — la línea de corte roja sobre tipografía expandida masiva + grain + claqueta mono no existe en otras 500 webs.)
+   105→
+   106→RIESGOS/PENDIENTES PRÓXIMA FASE:
+   107→- Integración real de WhatsApp Business API (hoy wa.me con mensaje prellenado — mínimo viable del brief 08.9).
+   108→- Backoffice de barberos para bloquear horarios (el data model ya lo soporta: ArtistService + Booking; falta UI admin — señalado como alcance futuro en 08.11).
+   109→- Cuenta/historial de sesiones por cliente (el modelo soporta evolución sin reescritura — brief 08.8).
+   110→- Lighthouse en producción (dev-mode no da números reales; la base es sólida: next/image + blur, fonts con swap, transform/opacity only).
+   111→
+   112→---
+   113→Task ID: CR-1
+   114→Agent: code-review subagent
+   115→Task: Review de código de la sesión "pass history + lookup + editorial + polish" (10 archivos, verificación empírica con browser + tsc + eslint + tests de API)
+   116→
+   117→Findings (severidad, archivo:línea, explicación):
+   118→1. HIGH — src/components/bardos/SessionPass.tsx:50 — Estado de error inalcanzable: `open = !!active || (!!routeId && isLoading)` no incluye `isError`; ante un 404 el overlay hace flash y se desmonta, y el bloque "ESE PASE NO EXISTE" + PassLookup (líneas 110–125) es código muerto. Verificado 3 vías (URL inválida directa, click en el strip, submit del lookup): un código/código-link erróneo muestra "BUSCANDO…" y desaparece en silencio dejando un hash muerto. Fix: incluir `isError` en `open` (p.ej. `!!routeId && (isLoading || isError)`).
+   119→2. MEDIUM — src/app/api/bookings/route.ts:104-105 — Regresión de tipos NUEVA: el narrowing de `service` no se propaga a la function declaration hoisted `createBooking` → `bunx tsc --noEmit` falla con "'service' is possibly 'null'" (enmascarado hoy por `typescript.ignoreBuildErrors: true` en next.config.ts). Fix: pasar `service` como parámetro o mover el chequeo adentro.
+   120→3. MEDIUM — src/lib/bardos/passes.ts:102-105 — `openPass` es no-op si el hash actual ya es el objetivo (no dispara `hashchange` → la query no se re-ejecuta): re-click en un pase cuyo fetch falló no hace nada (verificado). Combinado con (1) deja al usuario en callejón sin salida.
+   121→4. MEDIUM — src/app/api/bookings/route.ts:86 — Detección de colisión por string `String(err).includes("Unique constraint")` es frágil (cualquier cambio de mensaje de Prisma convierte cada colisión de ID en un 500 sin retry); debería matchear `Prisma.PrismaClientKnownRequestError` con `code === "P2002"`.
+   122→5. MEDIUM (pre-existente, no cubierto por el retry loop) — src/app/api/bookings/route.ts:54-88 — TOCTOU del slot: check de disponibilidad y create son awaits separados y no hay unique constraint en (artistId, date, time): dos requests intercalados al mismo slot pueden duplicar el turno (el loop nuevo solo cubre colisión de ID; no se reprodujo localmente por timing, pero la ventana existe).
+   123→6. LOW — src/components/bardos/TheArchive.tsx:135-136 — `aria-controls="story-XX"` apunta a un id que solo existe expandido (referencia inválida colapsado; verificado). Renderizar siempre la región o quitar aria-controls.
+   124→7. LOW — src/components/bardos/booking/PassStrip.tsx:80-84 — Botón ✕ (olvidar) es `text-smoke/0` hasta `group-hover`: invisible-per-clickeable en touch (sin hover), sin affordance visible en mobile.
+   125→8. LOW — src/components/bardos/booking/PassStrip.tsx:30-44 — Toda falla de fetch (500/red) se congela como "gone" → muestra "NO ENCONTRADO" también para errores transitorios.
+   126→9. LOW — src/components/bardos/SessionPass.tsx:98 — La ceremonia "SESSION CONFIRMED." se repite en cada re-apertura, incluso de pases cancelados (luego revela "TURNO CORTADO"; verificado con BRD-0248) — pre-existente, pero las nuevas flows de historial/lookup lo convierten en camino principal.
+   127→10. INFO — MenuOverlay/SessionPass — Diálogos `aria-modal` sin focus trap: controles del fondo (incl. botones nuevos del PassStrip) siguen en el tab order detrás del menú abierto (verificado). Patrón pre-existente.
+   128→11. INFO — SessionPass.tsx:49 — `active` cae a `routeData?.session ?? session`: con sesión vieja en store y fetch fallido muestra el pase VIEJO en vez del error (misma familia que (1)).
+   129→
+   130→Verificado OK (no listing per instrucciones, para contexto):
+   131→- passes.ts: cache raw-string de useSyncExternalStore es correcto — snapshot estable, hidratación segura (getServerSnapshot → re-render post-mount sin warnings de consola), updates por evento y cross-tab storage verificados; dedupe/orden/máx 12 OK.
+   132→- Retry loop de IDs: probado con carrera real (3 POST simultáneos → BRD-0254/0255 creados sin 500); hoisting de createBooking funciona en runtime; límite 25 + fallback 500 OK.
+   133→- close() con reset de sesión: no rompe cancel (onSuccess setea session → close la null-ea → historial la re-muestra) ni reschedule (startReschedule ya null-ea; doble null inocuo) ni onNew (reset keepCustomer OK).
+   134→- PassStrip: pase inexistente degrada como "NO ENCONTRADO" con dot apagado (graceful); forgetPass verificado; queries vivas OK.
+   135→- normalizePass/barcode: edges verificados (247, brd-247, BRD0247, "brd 247", 24, 1234567, unicode digits) sin crash.
+   136→- TheCut ThesisWord: useInView + opacidades sin riesgo de hidratación; tsc/eslint limpios en el resto.
+   137→- Limpieza: bookings de test (CR*) borrados; localStorage del browser de test limpiado.
+   138→
+   139→Stage Summary:
+   140→- VERDICTO: FIX FIRST. (1) rompe el propósito del lookup/código erróneo (código muerto + UX silenciosa) y (2) es regresión de tipos detectable por tsc. El resto del trabajo nuevo (passes.ts, PassStrip, retry loop, editorial) está sólido y empíricamente verificado.
+   141→
+   142→---
+   143→Task ID: QA2 (cron review 2026-09-06)
+   144→Agent: main (Z.ai Code)
+   145→Task: Ronda de QA + fixes críticos + features nuevas (historial de pases, lookup, editorial DE LA SILLA) + polish de styling. Resolución completa de todos los hallazgos de CR-1.
+   146→
+   147→Work Log:
+   148→- QA inicial (agent-browser): navegación de escenas, booking E2E, session pass, mobile 375px — funcionando. DETECTADO: dev server muerto (OOM).
+   149→- FIX INFRA-1 (crítico): dev server murió con `JavaScript heap out of memory` (Prisma log:['query'] flooding + heap sin límite). Solución: log reducido a warn/error (src/lib/db.ts) + `NODE_OPTIONS=--max-old-space-size=2048` en el dev script (4096 era demasiado para 4GB físicos — el kernel OOM-killer mataba el proceso; confirmado por dmesg). Patrón para levantar el server en este sandbox: `bash -c '( setsid nohup bun run dev </dev/null >/dev/null 2>&1 & ); exit 0'` (double-fork; nohup+disown solo NO sobrevive al cierre de la llamada bash).
+   150→- FIX BUG-1: generación de ID colisionaba ante resets de DB (count-based). Ahora: máximo sufijo numérico existente + retry de 25 intentos matcheando P2002 (no string matching).
+   151→- FIX BUG-2 (de CR-1 #1): estado de error del SessionPass inalcanzable (open no incluía isError → "ESE PASE NO EXISTE" + lookup eran código muerto). Lógica de `active` reescrita: isError → null (nunca muestra un pase viejo desactualizado); open incluye isError.
+   152→- FIX BUG-3: overlay del pase no se cerraba de verdad (close() no limpiaba session del store; overlay quedaba opacity:1 tapando el sitio). Ahora close() hace `useBooking.setState({ session: null })`.
+   153→- FIX BUG-4 (crítico, propio): loop infinito de renders (Maximum update depth) — useSyncExternalStore con snapshot inestable (read() devolvía array nuevo en cada llamada). Caché por raw-string con referencia estable + EMPTY constante.
+   154→- FIX BUG-5 (de CR-1 #5): guard TOCTOU anti double-booking en POST /api/bookings: tras crear, re-chequea overlaps activos del artista; si hubo carrera, borra la reserva nueva y responde 409+alternativas. VERIFICADO: 5 POST concurrentes al mismo slot → 1×201 + 4×409.
+   155→- FIX BUG-6 (de CR-1 #2): regresión tsc (service possibly null en createBooking hoisted) → capturas no-nulas (svc/art) + arrow fn. FIX extra: SHOP.openDays `as number[]` (2 errores tsc preexistentes en domain.ts/availability.ts). AHORA: `bunx tsc --noEmit` → 0 errores en src/.
+   156→- FIX BUG-7 (de CR-1 #3): openPass no-op con hash igual → ahora dispara hashchange + evento `bardos:refetch-session` que invalida la query del pase.
+   157→- FIX BUG-8 (de CR-1 #9): ceremonia "SESSION CONFIRMED." solo para sesiones creadas DESPUÉS del mount (mountedAt ref) y no canceladas. Re-aperturas/historial: sin ceremonia. VERIFICADO.
+   158→- FIX BUG-9 (de CR-1 #6/#7/#8): aria-controls solo cuando está expandido; botón ✕ del PassStrip siempre visible (text-smoke/70); distinción "NO ENCONTRADO" (404) vs "SIN CONEXIÓN" (red) en el historial.
+   159→- FIX WARNINGS: next/image fill en parent estático (Drift inner motion.div → `relative`); warning de framer container (main → `relative`).
+   160→- FEATURE-1: TUS PASES — historial local de pases (localStorage `bardos-passes`, 12 máx, dedupe) con estado VIVO consultado al server (PassStrip en #book bajo el tracker) + "TUS ÚLTIMOS PASES" en el menú. rememberPass() al confirmar/reprogramar.
+   161→- FEATURE-2: PASS LOOKUP — buscador por código (acepta "247", "brd-247", "BRD-0247") en el menú y en el estado de error del pase. VERIFICADO: error BRD-9999 → escribir "250" → abre BRD-0250.
+   162→- FEATURE-3: DE LA SILLA — columna editorial en THE ARCHIVE (3 piezas expandibles: origen 2019 / método del oficio / el club de los viernes) con hairline vertical de corte, aria-expanded, teaser hover desktop + editorial serif. Ataca el score DISCOVERY 8→9 de la auditoría.
+   163→- STYLING-1: tesis REMOVE/REFINE/DEFINE/BECOME ahora se enciende al cruzar el viewport (useInView, opacidades progresivas 0.42+i*0.06 → 0.78+i*0.05; BECOME full).
+   164→- STYLING-2: pulido del ticket del pase (feedback VLM): separadores unificados (—), remache rojo intencional (ring halo), barcode con guard bars 3-1-3 y h-11, padding del print legal (pb-6), año dinámico del createdAt.
+   165→- STYLING-3: marquee del archive con máscara de bordes (fade a negro en ambos extremos).
+   166→- QA VISUAL (VLM, 2 rondas): ronda 1 detectó contraste de tesis/separadores/remache/padding → todos corregidos; ronda final: PASS en los 6 screenshots (the-cut, pass, mobile archive, strip, error state, pass reabierto).
+   167→- QA FUNCIONAL FINAL: booking E2E por UI (BRD-0250/0253), lookup, historial, 409 real, carrera concurrente, cancelaciones, ceremonia fresca vs re-apertura, lint 0 errores, tsc 0 errores en src/, errores de página 0 en sesión limpia de browser. Server estable (RSS ~1.1GB / límite 2GB).
+   168→
+   169→Stage Summary:
+   170→- SITIO ESTABLE Y COMPLETO: 3 features nuevas (historial + lookup + editorial), 2 fixes de infra (OOM del dev server), 7 bugs corregidos (5 propios del QA + 2 preexistentes), 4 mejoras de styling. tsc/eslint/browser-errors: 0. Booking engine blindado (TOCTOU + colisiones de ID + edge case 08.10).
+   171→- Hallazgo importante para próximas sesiones: el dev server muere si se excede el heap (usar 2048, no 4096) y los procesos background solo sobreviven con double-fork setsid. Ver patrón arriba.
+   172→- Known issues restantes (no bloqueantes, prioridad baja): (a) focus trap en diálogos aria-modal (menú/pase) — controles de fondo siguen en el tab order (patrón pre-existente, CR-1 #10); (b) bookings de demo en la DB: BRD-0247 activo ("QA Cron Review") — reemplazar por seed de demo real cuando haya contenido de producción.
+   173→- Próxima fase recomendada: (1) focus trap a11y para overlays; (2) WhatsApp Business API real (hoy wa.me prellenado); (3) backoffice barberos (#admin hash scene, el data model ya lo soporta); (4) Lighthouse en producción.
+   174→
+   175→---
+   176→Task ID: QA3 (cron review 2026-09-06, ronda 2)
+   177→Agent: main (Z.ai Code)
+   178→Task: QA de estabilidad + FEATURE MAYOR (LA CABINA — backoffice de barberos, alcance futuro 08.11 del brief) + fixes de a11y + capa de styling. Desarrollo completo de la fase.
+   179→
+   180→Work Log:
+   181→- QA INICIAL (agent-browser): navegación de escenas OK, booking E2E OK (BRD-0254 creado y cancelado), mobile 375 OK, 0 errores de consola → fase estable, se procede a nuevas features.
+   182→- INCIDENTE RESUELTO: tras agregar el modelo BlockedSlot a Prisma, el dev server tenía el client stale (db.blockedSlot undefined → 500). Reinicio del server con el patrón double-fork documentado (setsid nohup) → resuelto.
+   183→
+   184→FEATURE-1 (MAYOR): LA CABINA — backoffice de barberos en #cabina (escena oculta, no está en el menú; la conoce el personal):
+   185→- Prisma: modelo BlockedSlot (id cuid, artistId, date, time, reason, createdAt) + relación Artist.blocks. db:push OK.
+   186→- Motor de disponibilidad (src/lib/bardos/availability.ts): ahora descuenta bloqueos igual que reservas (cada bloqueo ocupa SHOP.slotStep=30'). VERIFICADO: bloquear 14:00 → slots 13:30/14:00 unavailable para servicio de 45'; desbloquear → se restauran.
+   187→- APIs (header x-cabina-code, código CABINA_CODE env, default "MMXIX"):
+   188→  · GET /api/admin/agenda?date= → todos los artistas con bookings (include service name), blocks, y stats (totalBookings, totalBlocks, revenue, bookedMinutes, capacityMinutes). 401 sin código.
+   189→  · POST /api/admin/blocks {artistId, date, time, reason?} → valida artista, día atendido, ventana, grilla de slots, choque con reserva activa (409) y duplicado (409).
+   190→  · DELETE /api/admin/blocks?id= → corta el bloqueo.
+   191→- UI (src/components/bardos/cabina/Cabina.tsx, ~690 líneas): overlay full-screen en #cabina (mismo patrón de routing que #session/ID), gate de código con validación real contra la API (error inline "Código cortado."), código persistido en sessionStorage (bardos-cabina-code, se borra con SALIR), dashboard con:
+   192→  · Picker de días (tira editorial como el builder, HOY destacado, refresco 30″)
+   193→  · Tabs de artista (SANTI/VALO/NICO/RAMA, estado derivado sin setState-in-effect)
+   194→  · Timeline 10:00→19:30 en slots de 30′ (ROW_H=52px, gutter de horas, posiciones absolutas): reservas como bloques coal con borde rojo (cliente, servicio, duración, precio, notas, id, teléfono), bloqueos con hatch rojo (repeating-linear-gradient) y motivo, huecos libres dashed clickeables.
+   195→  · Bloquear: click en hueco → form inline (motivo opcional, uppercase) → POST. Desbloquear: click en bloqueo → confirmación de 2 clicks.
+   196→  · Stats: SESIONES CONFIRMADAS / CAJA PROYECTADA / HORARIOS BLOQUEADOS / OCUPACIÓN %.
+   197→  · Panel CÓMO SE USA (guía de uso en voz de marca).
+   198→  · Guard: al abrir #cabina se descarta la session del store (si había un pase abierto, se guarda en su URL/historial). Scroll congelado (lenis.stop + overflow hidden).
+   199→  · Mobile: agenda funcional + lista plana de sesiones del día abajo (md:hidden).
+   200→- QA E2E de la cabina (agent-browser): gate código erróneo ("WRONG" → "CÓDIGO CORTADO."), código correcto lowercase ("mmxix" → normalizado), dashboard, cambio de día (MAR 08 → VIE 11), bloqueo 15:00 con motivo "descanso largo" vía UI (aparece en timeline + contador), desbloqueo con doble confirmación, agenda con bookings demo, stats. APIs verificadas con curl (201/409/401/200).
+   201→
+   202→FEATURE-2: estado en vivo en THE SPACE:
+   203→- Badge "AHORA — ABIERTO/CERRADO" con dot rojo pulsante cuando abierto, borde rojo cuando abierto, texto dinámico "HASTA LAS 20:00" / "VOLVEMOS {próximo día atendido} 10:00" (nextOpening camina días hasta el próximo abierto, maneja "HOY 10:00").
+   204→- Fila HOY en la tabla de horarios: hairline roja vertical a la izquierda + "— HOY" en rojo + label off-white.
+   205→- Implementado con useSyncExternalStore (subscribe al reloj cada 30″, snapshot cacheada por raw-string para referencia estable, getServerSnapshot → null: sin mismatch de hidratación).
+   206→- VERIFICADO (VLM): badge y fila HOY visibles y legibles.
+   207→
+   208→FEATURE-3: LA LÍNEA DE CORTE AVANZA — hairline roja de 1px en el top del Nav que crece con el progreso del scroll (useScroll + useSpring, origin-left, visible cuando scrolled). VERIFICADO (VLM).
+   209→
+   210→FIX-1 (a11y, de CR-1 #10): useFocusTrap (src/components/bardos/useFocusTrap.ts) — hook genérico: guarda foco previo, enfoca primer enfocable al abrir, Tab/Shift+Tab ciclan dentro del contenedor, Escape cierra (stopPropagation), restaura foco al cerrar. Aplicado a MenuOverlay, SessionPass y Cabina. VERIFICADO: 10 Tabs consecutivos en menú abierto → foco siempre dentro; Escape cierra menú/pase/cabina; foco vuelve al elemento de origen.
+   211→- Nota: al clickear MENU programáticamente el foco de origen es body; con click real vuelve al botón MENU.
+   212→
+   213→STYLING (capa de detalle):
+   214→- THE PEOPLE: retratos con zoom sutil al hover (group/img scale 1.045, 900ms ease-reveal) + hairline roja que se extiende en el borde inferior del retrato + scene-no del artista pasa a rojo en hover. VERIFICADO (VLM): zoom, hairline y caption rojo visibles.
+   215→- THE CUT: LA LÍNEA DE CORTE en las filas de servicio — hairline roja vertical (3px) origin-top que escala al hover + número de la fila pasa a rojo. VERIFICADO (VLM): estado hover con fondo coal, 01 rojo, flecha y descripción.
+   216→- SESSION TRACKER (mobile): antes overflow-x-auto con truncado visual ("DAT…" cortado, detectado por VLM); ahora flex-wrap a 2 líneas en mobile + una línea en desktop. VERIFICADO: todos los labels visibles en 375px.
+   217→- CABINA (feedback VLM): contraste del gutter de horas (text-bone/80), id/teléfono de bookings (text-bone/60), servicio/duración/precio (text-bone/75), gutter alineado al inset de filas (top-[3px]), panel CÓMO SE USA con más aire (mt-8).
+   218→- NAV: clase b-link ya tenía underline rojo animado en MENU; se mantuvo y documentó.
+   219→
+   220→DATOS DEMO (reemplaza bookings de QA): borrados BRD-0247…0256 (QA/test). Seed de 14 bookings demo con nombres verosímiles (Martín Álvarez, Diego Ferreyra, Ezequiel Molina…), servicios variados, notas realistas, repartidos MIÉ 09→SÁB 12 SEP + 2 bloqueos demo (santi descanso jueves 14:00, rama proveedor viernes 13:00). La cabina y el sitio se ven "vivos" al preview. Fix: BRD-0014 movido de 09:30 (pre-apertura, solapado) a 13:00.
+   221→
+   222→VERIFICACIÓN FINAL:
+   223→- lint: 0 errores. tsc: 0 errores en src/ (preexistentes en examples/skills fuera de alcance). dev.log sin errores runtime. 0 errores de consola en sesión limpia.
+   224→- Booking E2E regression: BRD-0256 (CUT/VALO/MIÉ 09/12:30) creado vía UI tras todos los cambios + pass + Escape close → hash #book.
+   225→- Pass por ruta: #session/BRD-0001 (booking demo) abre el pase; Escape cierra.
+   226→- Mobile 375: homepage, booking, tracker y cabina OK (VLM).
+   227→- VLM ronda final: PASS en cabina (2 rondas con fixes aplicados), TheSpace live badge, hover People, hover Cut, tracker mobile.
+   228→
+   229→Stage Summary:
+   230→- LA CABINA completa: backoffice de barberos con agenda, bloqueos que afectan la disponibilidad pública en tiempo real, stats de caja. 3 features nuevas + focus trap a11y + 6 mejoras de styling + datos demo. Todo verificado E2E (UI + API + VLM).
+   231→- Código de la cabina: "MMXIX" (default del env CABINA_CODE). Acceso: URL #cabina (oculta, no está en el menú).
+   232→- Patrones aprendidos: el client de Prisma del dev server NO recarga al cambiar schema → reiniciar server tras db:push. El estado :hover computado en headless no es confiable para verificar CSS hover (verificar con screenshots+VLM o transiciones mid-flight).
+   233→
+   234→RIESGOS/PENDIENTES PRÓXIMA FASE:
+   235→- (a) Seguridad de la cabina: el código viaja en header desde el cliente (acceptable para demo; en producción: auth real + rate limit en /api/admin/*).
+   236→- (b) Los bloqueos no bloquean intentos de reserva simultáneos vía TOCTOU en POST /api/bookings (la validación usa getAvailability que ya descuenta bloqueos — verificado que un slot bloqueado NO se puede reservar por la API; el guard anti-carrera del POST ya existente cubre bookings, no bloqueos).
+   237→- (c) Focus trap: controles del fondo siguen "clickeables" por mouse (aria-modal estándar para screen readers; un overlay backdrop invisible los taparía — evaluar si hace falta).
+   238→- (d) WhatsApp Business API real (hoy wa.me prellenado) y Lighthouse en producción siguen pendientes.
+   239→- Próximos features candidatos: (1) edición de duración de bloqueos (hoy 30′ fijo), (2) notas internas por sesión visibles en la agenda, (3) export/print del día, (4) historial de sesiones por cliente (email lookup).
+   240→
+   241→---
+   242→Task ID: QA4 (cron review 2026-09-06, ronda 3)
+   243→Agent: main (Z.ai Code)
+   244→Task: QA de estabilidad + fixes de bugs detectados + FEATURES (bloqueos con duración, búsqueda de clientes, impresión del día y del pase, línea AHORA) + capa de styling tipográfico.
+   245→
+   246→Work Log:
+   247→- QA INICIAL (agent-browser): navegación de escenas OK, booking E2E OK (creación + pase + cancel 2-clicks), cabina OK (gate + dashboard), mobile 375 → DETECTADO 1 BUG REAL: scroll horizontal de 44px en mobile (scrollWidth 419 vs 375 a pesar del overflow-x:clip existente en body — el clip de body NO se propaga al documentElement). FIX: `html { overflow-x: clip }` en globals.css. Verificado: scrollX=0 tras scrollTo({left:80}).
+   248→- FIX 2: warning de next/image (craft-scissors.webp con fill en parent estático) — el InlineImg de TheWorld (motion.span inline-block) ahora es `relative`. Console limpia tras reload (solo queda 1 warning benigno de framer dev-mode, ver riesgos).
+   249→- VERIFICACIÓN de riesgo (c) de QA3: los overlays (menú/pase/cabina) son fixed inset-0 con bg-black → el fondo NO es clickeable por mouse. Riesgo descartado (era teórico).
+   250→
+   251→FEATURE-1 (MAYOR): BLOQUEOS CON DURACIÓN (30/60/90/120′) — resuelve candidato pendiente (1) de QA3:
+   252→- Prisma: BlockedSlot.minutes Int @default(30) + db:push + REINICIO del dev server (patrón double-fork documentado; client de Prisma no recarga solo).
+   253→- Motor de disponibilidad (availability.ts): descuenta bl.minutes (no más slotStep fijo).
+   254→- POST /api/admin/blocks: acepta minutes (zod: múltiplo de slotStep, 30–120); valida que cierre antes de closeHour (400 con mensaje), choque con reservas por RANGO completo (409), solapamiento con otros bloqueos por rango (409). VERIFICADO con curl: 409 sobre booking, 201 libre, 400 pasando las 20:00, 90′ bloquea 3 slots de un servicio de 45′.
+   255→- Agenda API: blocks ahora devuelven minutes; stats ahora reporta totalBlockMinutes ("MINUTOS BLOQUEADOS").
+   256→- UI Cabina: chips de DURACIÓN (30′/60′/90′/120′) en el form inline (radiogroup a11y); solo ofrece duraciones que cierran dentro del día; el bloqueo se dibuja multi-fila (spanRows), muestra "17:30–18:30 — MOTIVO" + "60′", y los slots bajo su cola quedan covered. VERIFICADO E2E vía UI real (click + fill): bloqueo CENA EQUIPO 60′ creado → height 100px (2 rows) → 18:00 covered → desbloqueo 2 clicks.
+   257→- Nota de interacción: los eventos sintéticos (el.click() + Event('input')) NO registran en inputs controlados de React — usar siempre los comandos click/fill/type reales de agent-browser.
+   258→
+   259→FEATURE-2 (MAYOR): CLIENTES — QUIÉN LLAMA (lookup en la cabina; resuelve candidato (4) de QA3):
+   260→- GET /api/admin/clients?q= (header x-cabina-code, 401 sin código): busca por nombre SIN ACENTOS ("martin" → "Martín", normalización NFD) y por dígitos de teléfono (≥4); agrupa por cliente (clave: teléfono), devuelve total de sesiones, gastado, canceladas, próxima sesión activa y últimas 6 del historial. máx 6 clientes.
+   261→- UI: panel en la sidebar de la cabina con input search, estados (buscando/sin coincidencias/error), tarjetas con PRÓXIMA en rojo, historial con canceladas tachadas. VERIFICADO: "martin" → MARTÍN ÁLVAREZ (+5491144320011, 1 SESIÓN, $16.000, PRÓXIMA MIÉ 09 10:30 SANTI); "1155" → 3 clientes por teléfono. VLM PASS (contraste/legibilidad).
+   262→
+   263→FEATURE-3 (MAYOR): IMPRESIÓN — dos raíces imprimibles:
+   264→- Patrón: portal a document.body con [data-print-root] + CSS `@media print { body > *:not([data-print-root]) { display: none } }` → se imprime SOLO la hoja, la app desaparece. blanco y negro, tipografía pt, break-inside avoid.
+   265→- HOJA DE RUTA (cabina): botón "IMPRIMIR EL DÍA" en la claqueta. Header (BARDOS/LA CABINA, fecha, GENERADA HH:MM), stats del día, por artista: tabla tiempo/cliente/servicio/tel + bloqueos en cursiva gris + sección NOTAS de sesiones, footer con datos del local. VERIFICADO: `agent-browser pdf` captura exactamente la hoja (pdftotext confirma contenido completo, app oculta).
+   266→- PASE DE SESIÓN (cliente): acción "IMPRIMIR PASE" en PassActions + PrintPass portal. Ticket con header (PASE DE SESIÓN/PASE CORTADO + código), tabla de 9 filas (fecha/hora/servicio/artista/cliente/tel/duración/precio), notas, línea de corte dashed, footer con dirección. VERIFICADO con pdf (BRD-0001 completo).
+   267→
+   268→FEATURE-4: LÍNEA AHORA en la timeline de la cabina — reloj vivo (interval 30″, useSyncExternalStore no necesario aquí): hairline roja con glow en la posición del minuto actual (solo si el día es hoy y está dentro de 10–20hs), label "AHORA" a la derecha + en la leyenda con la hora. El gutter de horas y slots pasados también se actualizan con el reloj. VERIFICADO (DOM + VLM: "red NOW line at 17:00 mark").
+   269→
+   270→FEATURE-5: guardia de borrador en el builder — beforeunload (preventDefault + returnValue) cuando step > 1 y no hay sesión confirmada: el refresh distraído no pierde la reserva a medio construir (el navegador muestra su aviso nativo). Patrones estándar; hash navigation NO lo dispara (correcto).
+   271→
+   272→FEATURE-6: hint ESC en el menú — kbd mono bordeado + "CIERRA" (desktop only) en el footer del MenuOverlay. Escape ya cerraba (focus trap QA3); ahora se ve. VERIFICADO (DOM + Escape cierra).
+   273→
+   274→STYLING (capa de detalle tipográfico/UX):
+   275→- tabular-nums en .font-display y .type-mono-label (la caja y los stats no "bailan" al refrescar números).
+   276→- caret-color roja en todos los inputs; ::placeholder en smoke al 70%.
+   277→- Marquee del archive: pausa al hover/focus (animation-play-state) — se puede mirar un fotograma con calma.
+   278→- Leyenda de lectura (SESIÓN/BLOQUEO/LIBRE/AHORA) sobre la timeline de la cabina + empty state "EL DÍA ESTÁ LIBRE — click en un hueco para bloquear."
+   279→- Pluralización correcta: "1 SESIÓN" vs "N SESIONES" (panel clientes + hoja de ruta) — detectado por VLM, corregido y reverificado.
+   280→- Panel CÓMO SE USA actualizado (duraciones + clientes).
+   281→
+   282→LIMPIEZA DE DATOS: borrados los bookings de QA (BRD-0247 ronda 4 y regresión); queda el bloqueo demo CENA EQUIPO 60′ (SÁB 05 17:30, santi) que deja la cabina y la disponibilidad "vivas" para preview.
+   283→
+   284→VERIFICACIÓN FINAL:
+   285→- lint: 0 errores. tsc: 0 errores en src/. dev.log: sin errores runtime (solo 200s/201s/404s esperados de pases borrados).
+   286→- Booking E2E regression post-cambios: CUT+BEARD/VALO/JUE 10/14:30 → BRD-0247 creado → pase con IMPRIMIR PASE + portal → cancel 2-clicks → cancelled → borrado de DB.
+   287→- Console limpia en sesión fresca (1 warning benigno de framer dev-mode sobre offset de scroll — todos los targets useScroll están positioned; es una carrera de medición en hidratación, no afecta UX ni producción).
+   288→- Mobile 375: form de bloqueo con chips cabe (287px), solo ofrece duraciones válidas para el horario (18:30 → 30/60/90, no 120 porque pasa las 20:00).
+   289→- VLM (4 rondas): PASS en cabina dashboard completo, bloqueo 60′ multi-slot, panel clientes (contraste/legibilidad), corrección singular.
+   290→- PDFs de impresión verificados con pdftotext: hoja de ruta y pase.
+   291→
+   292→Stage Summary:
+   293→- Sitio estable y completo. Esta ronda: 2 bugs reales corregidos (scroll horizontal mobile + warning de imagen), 6 features nuevas (bloqueos con duración E2E, búsqueda de clientes con acentos-insensible, 2 vistas de impresión reales verificadas en PDF, línea AHORA viva, guardia de borrador, hint ESC) y una capa de pulido tipográfico (tabular-nums, caret, placeholder, marquee pause, pluralización).
+   294→- La cabina pasó de "agenda consultable" a herramienta de trabajo completa: bloquear por duración, buscar quién llama, imprimir la hoja del día.
+   295→- El pase del cliente ahora existe también como objeto físico imprimible.
+   296→- Patrón de print reutilizable: [data-print-root] portal + @media print body-hide — usar para futuras vistas imprimibles.
+   297→
+   298→RIESGOS/PENDIENTES PRÓXIMA FASE:
+   299→- (a) 1 warning benigno de framer en dev (offset de scroll en hidratación) — cosmético, solo dev; si molesta, investigar orden de medición de useScroll en Opening/ThePeople al montar.
+   300→- (b) Cabina security sigue siendo header-based (aceptable para demo; producción: auth real + rate limit en /api/admin/*).
+   301→- (c) La búsqueda de clientes filtra en memoria sobre las últimas 500 bookings — escalará bien para un local real, pero si algún día se necesita, migrar a query SQL con COLLATE NOCASE.
+   302→- (d) WhatsApp Business API real y Lighthouse en producción siguen pendientes (heredados).
+   303→- Próximos features candidatos: (1) marcar sesiones como COMPLETADAS desde la cabina (hoy solo confirmed/cancelled — el status existe en el dominio), (2) notas internas editables por sesión, (3) stats semanales comparativas en la cabina, (4) recordatorio automático por WhatsApp 24hs antes (requiere API real).
+   304→
+   305→---
+   306→Task ID: QA5 (cron review 2026-09-06, ronda 4)
+   307→Agent: main (Z.ai Code)
+   308→Task: QA de estabilidad + FEATURES (ciclo de vida de sesión COMPLETADA, EL CLUB signup público, slider EL RESULTADO antes/después con IA) + fixes de bugs propios + guards de dominio.
+   309→
+   310→Work Log:
+   311→- QA INICIAL (agent-browser): escenas OK, cabina OK, mobile 375 sin scroll horizontal (fix de QA4 se mantiene), console limpia → fase estable, se avanza a features.
+   312→
+   313→FEATURE-1 (MAYOR): CICLO DE VIDA DE SESIÓN — COMPLETADA (cabina), resuelve candidato (1) de QA4:
+   314→- PATCH /api/admin/bookings {id, status} (header x-cabina-code, 401 sin código): transiciones válidas SOLO confirmed→completed y completed→confirmed (reabrir); cualquier otra combinación → 409. VERIFICADO: 401, 200, doble-complete → 409, reopen → confirmed.
+   315→- GUARDS DE DOMINIO (bugs encontrados al probar): cancel y reschedule aceptaban sesiones COMPLETADAS (cancel borraba el registro del trabajo hecho). Ahora ambos devuelven 409 con mensaje claro ("Esa sesión ya se cortó…"). El estado completed es terminal para el cliente; solo la cabina lo reabre.
+   316→- Disponibilidad: completed AHORA CUENTA COMO OCUPADO en el motor (availability.ts) — marcar completada una sesión futura NO libera el slot para doble-book.
+   317→- Agenda API: incluye completed (con status por booking); stats nuevos: completed count + revenueDone (CAJA REALIZADA vs CAJA PROYECTADA).
+   318→- UI Cabina: botón "✓ CORTADO" (borde rojo) en cada sesión confirmada → al completar: tarjeta atenuada (opacity 0.62, borde rojo tenue, nombre tachado con decoration-red), botón cambia a "REABRIR". Mobile: lista plana con el mismo flujo. Stats panel: SESIONES CONFIRMADAS / CORTES COMPLETADOS (n/total) / CAJA REALIZADA / CAJA PROYECTADA / MINUTOS BLOQUEADOS / OCUPACIÓN. Hoja de ruta print: completadas con "✓" sufijo. Panel CÓMO SE USA actualizado.
+   319→- SessionPass (cliente): estado completado — PassCard muestra "ESTE CORTE YA ESTÁ HECHO." y PassActions entra en modo post-sesión: "RESERVAR EL PRÓXIMO CORTE" + GUARDAR LINK + IMPRIMIR PASE (sin WhatsApp/reprogramar/cancelar — no tienen sentido).
+   320→- E2E VERIFICADO vía UI: booking BRD-0248 → ✓ CORTADO → tarjeta completed + stats 1/2 + caja realizada → REABRIR → confirmed. VLM PASS (reconstrucción fiel: completed card con REABRIR, ✓ CORTADO en pendiente, stats nuevos).
+   321→
+   322→FEATURE-2 (MAYOR): EL CLUB — signup público (public-facing, primer feature de captación):
+   323→- Prisma: modelo ClubSignup (id cuid, name, contact, createdAt, @@unique(contact)) + db:push + reinicio del server (patrón double-fork).
+   324→- POST /api/club {name, contact}: zod (name ≥2, contact ≥5), acepta email O teléfono (regex email; teléfono = 8–15 dígitos tras strip), dedupe por contacto normalizado (email lowercase / solo dígitos) → responde already:true sin error (200), antiflood en memoria (6/min por contacto con limpieza del mapa), 429, 400 con mensajes en voz de marca.
+   325→- FIX BUG propio: teléfonos con espacios ("+54 9 11 …") eran rechazados (condición includes(" ") innecesaria) — eliminada. Re-verificado: acepta.
+   326→- UI: formulario dentro de la pieza editorial 03 (EL CLUB — LOS VIERNES) de DE LA SILLA — se despliega con la historia. Inputs TU NOMBRE / MAIL O TELÉFONO (stack en mobile, 2 col en sm+), botón ENTRAR AL CLUB, estados: ANOTANDO… / error inline / success "ESTÁS EN LA LISTA." (o "YA ESTABAS EN LA LISTA.") con cop editorial y nombre de pila.
+   327→- E2E VERIFICADO vía UI (Joaquín Prueba + email → ESTÁS EN LA LISTA con nombre) + curl (dedupe, 400 inválido, teléfono OK, short name 400). VLM + mobile: form cabe en 375px, inputs apilados.
+   328→
+   329→FEATURE-3 (MAYOR): EL RESULTADO — slider antes/después (THE CRAFT):
+   330→- IMÁGENES IA: truco de consistencia — se generó UN diptych ("the SAME man twice side by side, identical setup") y se cortó por la mitad con PIL → cut-before.webp / cut-after.webp (576×864 c/u): mismo hombre, misma luz, mismo encuadre, garantizado por construcción. 3 intentos de pares separados fallaron alineación (VLM lo detectó) — el diptych lo resuelve de raíz. VLM PASS del par final: mismo hombre, contraste claro ruido/corte, alineados.
+   331→- Componente CutReveal (TheCraft, tras la grilla macro): capa base ANTES + capa DESPUÉS recortada con clipPath inset por posición; LA LÍNEA = hairline roja 2px con glow + grip 44px (borde rojo, bg black/85, ⇄ mono) — role="slider" keyboard (flechas ±5, shift ±15, Home/End), drag por pointer events en todo el frame con setPointerCapture, touch-none para móvil, cursor ew-resize.
+   332→- Intro cinematográfica: arranca 100 (todo antes) → al entrar al viewport (IO 0.35) la línea barre a 42 con transición 0.9s — "el primer corte". FIX BUG propio: el cleanup del efecto mataba el timer del sweep (setArmed → re-render → cleanup → clearTimeout) — separado en dos efectos (armar / barrear). VERIFICADO: valuenow 100→42.
+   333→- Etiquetas EL RUIDO — ANTES / EL CORTE — DESPUÉS (fade por proximidad de línea), pie FR 220 + DRAG LA LÍNEA.
+   334→- E2E VERIFICADO: drag real (42→50), teclado (80→90 con ArrowRight), intro sweep, mobile 375 cabe (341px, touch-none). VLM PASS (reconstrucción fiel de todos los elementos).
+   335→
+   336→LIMPIEZA: borrados bookings de QA (BRD-0247/0248) y club signups de test. Demo seed intacto.
+   337→
+   338→VERIFICACIÓN FINAL:
+   339→- lint 0 errores, tsc 0 errores en src/, dev.log sin runtime errors (200/201/400/401/409 esperados).
+   340→- Console limpia en sesión fresca. Mobile 375: sin h-scroll, slider cabe, club form apilado.
+   341→- Booking E2E regression: CUT/VALO/MIÉ 09/13:00 → BRD-0247 creado → pase → cancel 2-clicks → cancelled → borrado.
+   342→- Guard cancel-on-completed verificado por curl.
+   343→
+   344→Stage Summary:
+   345→- 3 features nuevas: ciclo de vida completo de la sesión (el backoffice ahora cierra el día de verdad: caja realizada vs proyectada), EL CLUB (primer feature de captación pública con DB), EL RESULTADO (el slider antes/después — la demo del producto con imágenes IA consistentes por construcción diptych).
+   346→- 3 bugs propios detectados y corregidos en el mismo round (timer del sweep, validación de teléfono, guards de cancel/reschedule sobre completed).
+   347→- Patrones nuevos documentados: diptych-split para pares de imágenes consistentes; separar "armar" y "ejecutar" en efectos con timers; completed como estado terminal del lado cliente.
+   348→
+   349→RIESGOS/PENDIENTES PRÓXIMA FASE:
+   350→- (a) El listado de signups del club no tiene vista backoffice (solo DB) — candidato natural: panel "LA LISTA" en la cabina (GET /api/admin/club).
+   351→- (b) VLM tiende a "reconstruir HTML" en screenshots de dashboards oscuros — leer la reconstrucción como confirmación de contenido funciona, pero preferir checks DOM cuando sea posible.
+   352→- (c) Heredados: WhatsApp Business API real, Lighthouse, auth real para cabina.
+   353→- Próximos features candidatos: (1) panel LA LISTA del club en cabina + export, (2) stats semanales comparativas (esta semana vs anterior), (3) marcar no-show (otro estado útil del dominio), (4) recordatorio 24hs (depende de WhatsApp API).
+   354→
+   355→---
+   356→Task ID: 1-b
+   357→Agent: full-stack-developer
+   358→Task: Site restructure — remove TheWorld, single barber TOMÁS BUCHETT, booking right after hero, full Spanish (es-AR) translation, relocate to San Martín de los Andes, thesis QUITAR/PULIR/DEFINIR/SER, new seed + demo data.
+   359→
+   360→Work Log:
+   361→- Leí worklog.md (secciones QA4/QA5) + los 20 archivos objetivo antes de editar.
+   362→- ELIMINADO src/components/bardos/TheWorld.tsx y su import/uso; grep de "TheWorld"/"world" → 0 referencias (el ítem EDITIAL→world del menú se reemplazó).
+   363→- BardosExperience.tsx: nuevo orden de escenas — Opening → YourSession → ThePeople → TheCraft → TheCut → TheArchive → TheSpace (TU TURNO inmediatamente bajo el hero); comentario de actos actualizado (ENTER → TU TURNO → EL BARBERO → EL OFICIO → EL CORTE → ARCHIVO → EL CUARTO → RETURN).
+   364→- MenuOverlay.tsx: 7 ítems en español (INICIO/TURNO/EL BARBERO/EL OFICIO/EL CORTE/EL ARCHIVO/EL CUARTO, document order), CLOSE ×→CERRAR ×, BARDOS / MENÚ, footer ciudad→SAN MARTÍN DE LOS ANDES — NEUQUÉN, sizing mobile 7 ítems (text-[11vw] md:text-[6.5vw], py-2.5 md:py-4).
+   365→- Nav.tsx: MENU→MENÚ, BOOK→TURNO (mismo estilo bordered-box).
+   366→- domain.ts: SHOP (city SAN MARTÍN DE LOS ANDES, address "Av. San Martín 2123, Galería Los Nogales", phoneWa 5492944603267); NUEVO artistDisplayName(id) con ARTIST_NAMES {tomas: "TOMÁS BUCHETT"}; comentario de nowBuenosAires actualizado (sirve S.M.d.l.A., mismo UTC-3).
+   367→- TheCut.tsx: THESIS→QUITAR/PULIR/DEFINIR/SER; Slate ACTO III — EL CORTE; heading ¿QUÉ TE CORTAMOS?; aria "El Corte — servicios"; FIX de alineación de la descripción en hover: pl-16 en el span (alineada bajo el nombre: scene-no w-10 + gap-x-6 = 4rem).
+   368→- ThePeople.tsx: ACTO II — EL BARBERO / EL BARBERO.; intro reescrita para un solo barbero; quote de Joaco corregida ("traje" + Tomás); aria "El Barbero — Tomás Buchett".
+   369→- TheCraft.tsx: ACTO II — EL OFICIO; REC — FADE / CÁMARA LENTA; ARRASTRÁ LA LÍNEA.
+   370→- TheArchive.tsx: ARCHIVO — MMXIX → MMXXVI; STRIP artist-nico→artist-tomas (alt "Tomás, barbero de Bardos"); STORIES[0] reescrita para Av. San Martín 2123 / Galería Los Nogales / Koken rescatado de un galpón de Junín de los Andes; meta PIEZA 01 / AV. SAN MARTÍN 2123; ClubSignup VIERNES 19:30 · AV. SAN MARTÍN 2123.
+   371→- TheSpace.tsx: ACTO II — EL CUARTO; SAN MARTÍN DE LOS ANDES — NEUQUÉN; mapsUrl con ", San Martín de los Andes, Neuquén, Argentina"; caption nocturno AV. SAN MARTÍN 2123.
+   372→- Booking (español completo): YourSession (ACTO I — TU TURNO / TU TURNO. / STEP_TITLES SERVICIO·BARBERO·FECHA·HORA·DATOS·CONFIRMAR / captions BARBERO—/SERVICIO—); SessionTracker (TU TURNO / TU TURNO ESTÁ LISTO.); StepService (SERVICIO / ¿QUÉ TE CORTAMOS?); StepDate/StepTime (FECHA / HORA / ¿CUÁNDO?); StepDetails (DATOS / TU PASE); StepConfirm (CONFIRMAR / TU TURNO / CONFIRMAR TURNO).
+   373→- StepArtist.tsx: BARBERO / ¿QUIÉN TE CORTA?; hints para barbero único; NUEVA feature card SoloArtist cuando eligible.length===1 (aspect-[4/3] md:aspect-[16/8], nombre text-[clamp(30px,4vw,54px)], tag de claqueta, click-to-choose + ELEGIDO + micro-feedback de foto); grilla multi-artistas conservada como fallback.
+   374→- SessionPass.tsx: artistDisplayName en PassCard/PrintPass/waText/ICS (nunca más artistId.toUpperCase()); "Nos vemos en Bardos, …"; CERRAR ×; ceremonia TURNO CONFIRMADO.; legal del pase con Av. San Martín 2123 + Galería Los Nogales (fix typo PODÉ→PODÉS); barcode label SAN MARTÍN DE LOS ANDES (text-right, tracking reducido para que quepa); waText "Confirmo mi turno … Nos vemos en San Martín de los Andes."; BeforeSession DÓNDE/QUÉ ESPERAR (Tomás dice qué se puede) + mapsUrl; ICS LOCATION/DESCRIPTION en español; PrintPass BARDOS — BARBERÍA · SAN MARTÍN DE LOS ANDES + CORTÁ EL RUIDO.
+   375→- Footer.tsx: ACTO FINAL — VUELTA; NOS VEMOS PRONTO. (nowrap span); nav EL CORTE/EL BARBERO/EL CUARTO/TURNO; © HECHO A NAVAJA EN SAN MARTÍN DE LOS ANDES.
+   376→- Cabina.tsx: CERRAR ×; hoja de ruta print CORTÁ EL RUIDO · AV. SAN MARTÍN 2123; comentario del reloj → San Martín de los Andes (agenda/stats data-driven, OK con 1 barbero).
+   377→- layout.tsx metadata: título/desc/keywords/OG/Twitter → San Martín de los Andes + Patagonia + CORTÁ EL RUIDO.
+   378→- scripts/seed.ts REESCRITO: wipe idempotente (bookings/bloqueos/artistService/artist/service notIn); catálogo con ids/nombres EN ESPAÑOL (corte 45′ $16.000 / corte-barba 65′ $23.000 / color 90′ $28.000 / tratamiento 30′ $12.000 / ritual 90′ $34.000); artista único tomas TOMÁS BUCHETT (tag EL BARBERO, specialty CORTE · BARBA · NAVAJA, foto artist-tomas.webp que ya existía con entrada en el manifest); 10 bookings demo (BRD-0001..0009 confirmadas 08-12 sep 2026 + BRD-0010 completed 05 sep) con snapshots minutes/price del servicio; 2 bloqueos demo (ALMUERZO 60′ y PROVEEDOR 30′). EJECUTADO: services 5, artists 1, links 5, bookings 10, blocks 2.
+   379→- prisma/schema.prisma: SOLO comentarios actualizados (ids nuevos) — sin cambios de estructura, no requirió db:push.
+   380→- Sweeps: palermo/gorriti/avellaneda/santi/valo/nico/rama → 0 referencias en src/ y scripts/ (queda "Buenos Aires" SOLO en: comentarios de zona horaria de dominio UTC-3 (intencional), el nombre de función nowBuenosAires (permitido) y Opening.tsx (NO TOCADO — agente paralelo es dueño del hero)); ids viejos de servicio ("cut"/"cut-beard"/"treatment") → 0 en src (los "cut" que quedan son el error-code 409 de la API, no ids); palabras sueltas en inglés en UI → 0.
+   381→- VERIFICACIÓN: bun run lint → 0 errores; bunx tsc --noEmit → 0 errores en src/ (solo preexistentes en examples/ y skills/, fuera de alcance); GET / 200 y /api/catalog 200 con artists=[tomas] y 5 servicios en español; /api/availability?artistId=tomas&serviceId=corte fecha demo marca los slots ocupados correctamente; /api/bookings/BRD-0001 devuelve la reserva demo; dev.log sin errores de compilación (solo un full-reload transitorio durante la ventana de ediciones en caliente, recuperado solo); HTML renderizado confirma ACTO I — TU TURNO / ¿QUÉ TE CORTAMOS / QUITAR·PULIR·DEFINIR·SER / SAN MARTÍN DE LOS ANDES y 0 apariciones de TheWorld/Palermo/Gorriti.
+   382→
+   383→Stage Summary:
+   384→- Sitio reestructurado: sin TheWorld, TU TURNO es el primer acto después del hero, un solo barbero (TOMÁS BUCHETT) presentado como feature (StepArtist solo-card + ThePeople editorial), todo el copy de UI en español voseado y el local reubicado en Av. San Martín 2123, Galería Los Nogales, San Martín de los Andes (Neuquén) con WhatsApp +54 9 2944 60-3267.
+   385→- Tesis del corte ahora QUITAR / PULIR / DEFINIR / SER; descripción de servicios en hover alineada bajo el nombre (pl-16).
+   386→- Seed idempotente con catálogo en español + 10 reservas demo + 2 bloqueos → cabina y disponibilidad "vivas" para preview. serviceId.toUpperCase().replace("-"," + ") sigue funcionando con los ids nuevos ("corte-barba" → "CORTE + BARBA").
+   387→- Pendiente/riesgos: (a) Opening.tsx todavía dice "BUENOS AIRES"/"THE CUT."/"SCROLL" — el agente de hero redesign lo está reescribiendo, NO lo toqué; (b) artistDisplayName es el único mapa de nombres (tomas) — si se agregan barberos, alimentarlo desde el catálogo; (c) imágenes viejas de artistas (santi/valo/nico/rama) siguen en public/images y en el manifest (inofensivas, sin referencias en UI) — se pueden borrar en una limpieza futura; (d) bookings demo usan IDs fijos BRD-0001..0010 (el generador de IDs toma max sufijo → próxima reserva será BRD-0011, sin colisión).
+   388→

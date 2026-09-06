@@ -1,0 +1,98 @@
+// BARDOS BARBER — data model del booking engine
+// Diseñado según Apéndice C del brief: la UI consume la forma Service/Artist/Slot/Session,
+// la disponibilidad se computa server-side (horarios de trabajo − reservas) para poder
+// migrar luego a Cal.com / Google Calendar / backend propio sin reescribir la UI.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Service {
+  id       String @id // "corte" | "corte-barba" | "color" | "tratamiento" | "ritual"
+  name     String // "CORTE"
+  nameEs   String // descripción corta funcional (es-AR)
+  desc     String // narrativa editorial
+  minutes  Int
+  price    Int // ARS
+  photo    String
+  order    Int
+  artists  ArtistService[]
+  bookings Booking[]
+}
+
+model Artist {
+  id        String  @id // "tomas"
+  name      String
+  tag       String? // "EL BARBERO"
+  specialty String
+  bio       String
+  photo     String
+  rank      Int
+  active    Boolean @default(true)
+  services  ArtistService[]
+  bookings  Booking[]
+  blocks    BlockedSlot[]
+}
+
+model ArtistService {
+  artistId  String
+  serviceId String
+  artist    Artist  @relation(fields: [artistId], references: [id])
+  service   Service @relation(fields: [serviceId], references: [id])
+
+  @@id([artistId, serviceId])
+}
+
+model Booking {
+  id        String   @id // "BRD-0247"
+  serviceId String
+  service   Service  @relation(fields: [serviceId], references: [id])
+  artistId  String
+  artist    Artist   @relation(fields: [artistId], references: [id])
+  date      String // "2026-01-16" (ISO, local BA)
+  time      String // "18:30"
+  minutes   Int // duración snapshot del servicio
+  price     Int // precio snapshot
+  name      String
+  phone     String
+  email     String?
+  notes     String?
+  status    String   @default("confirmed") // pending | confirmed | cancelled | rescheduled | completed
+  prevId    String? // cadena de reschedule
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([artistId, date, status])
+}
+
+// LA CABINA (backoffice): horarios bloqueados por el barbero
+// (descanso, cliente que llega tarde, mantenimiento).
+// La disponibilidad los descuenta igual que una reserva.
+model BlockedSlot {
+  id        String   @id @default(cuid())
+  artistId  String
+  artist    Artist   @relation(fields: [artistId], references: [id])
+  date      String // "2026-01-16" (ISO, local BA)
+  time      String // "13:00" (inicio)
+  minutes   Int      @default(30) // duración: múltiplo de slotStep (30/60/90/120)
+  reason    String   @default("BLOQUEO")
+  createdAt DateTime @default(now())
+
+  @@index([artistId, date])
+}
+
+// EL CLUB — la lista de los viernes (signup público en el Archive).
+// El club no se promociona: se acumula. Pero la puerta se anuncia por mail/tel.
+model ClubSignup {
+  id        String   @id @default(cuid())
+  name      String
+  contact   String // email o teléfono (se acepta ambos, se guarda tal cual)
+  createdAt DateTime @default(now())
+
+  @@unique([contact])
+}

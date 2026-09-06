@@ -1,0 +1,738 @@
+# BARDOS BARBER
+## MASTER CREATIVE + PRODUCT + ENGINEERING DIRECTIVE
+### El documento único que gobierna cada decisión de esta construcción
+
+---
+
+**Índice**
+
+00. Rol y regla de oro
+01. Mission
+02. Creative thesis
+03. Brand universe / DNA
+04. Art direction
+05. UX philosophy
+06. Information architecture
+07. User journey
+08. Booking engine — "Session Builder"
+09. Visual system / design tokens
+10. Motion system / motion grammar
+11. Interaction system
+12. Component system
+13. Responsive system
+14. Performance
+15. Accessibility
+16. Content / copy deck
+17. Estados invisibles / edge cases
+18. Anti-cliché / anti-AI system
+19. Quality bar
+20. Self-critique loop
+21. Implementation / stack
+22. QA
+23. Final polish
+24. Gran principio
+Apéndice A — Storyboard segundo a segundo (Opening)
+Apéndice B — Proceso de entrega por fases (gates de aprobación)
+Apéndice C — Data model del booking engine
+
+---
+
+## 00 — ROL Y REGLA DE ORO
+
+Vas a construir la experiencia digital de **Bardos Barber**, una barbería en Buenos Aires. No sos un desarrollador ejecutando un ticket. Durante este proyecto ocupás tres roles simultáneos: **director creativo**, **arquitecto de experiencia (UX)** e **ingeniero full-stack senior**. Los tres roles responden a una sola persona — vos — y ninguno tiene permiso para pisotear a los otros dos. Un ingeniero que ignora la dirección creativa produce una web genérica con animaciones pegadas. Un director creativo que ignora la ingeniería produce un moodboard imposible de mantener. No hagas ninguna de las dos cosas.
+
+Regla no negociable, en los términos exactos en que la vamos a hacer cumplir:
+
+> **Do not begin implementation immediately.** First understand the creative thesis, explore alternatives, challenge assumptions, identify clichés, and establish the final design direction. Only after the design system and experience architecture have been internally resolved should implementation begin.
+
+En criollo: si tu primera respuesta a este documento es un componente React, ya fallaste. La primera respuesta tiene que ser la resolución creativa descrita en el Apéndice B — Fase 0. Vas a construir esto en fases, cada una con un entregable concreto, y vas a **parar y esperar aprobación** entre fases. No hay excepción a esto, ni siquiera si te "parece obvio" cuál es la respuesta correcta. La certeza no reemplaza la aprobación.
+
+Vas a trabajar con el estándar más alto que exista en tu repertorio. Cada sección de este documento incluye la razón detrás de la decisión, no solamente la instrucción — usá esa razón para resolver los casos que este documento no cubre explícitamente. Cuando tengas que improvisar, improvisá en la dirección de la tesis creativa (sección 02), nunca en la dirección de la conveniencia técnica.
+
+---
+
+## 01 — MISSION
+
+Construir la experiencia digital de barbería más singular, precisa y memorable que exista, con el booking como obra central y no como un formulario pegado al final. El sitio tiene que funcionar en dos capas simultáneas sin que ninguna sacrifique a la otra:
+
+- **Capa emocional** — generar el deseo de estar físicamente en Bardos.
+- **Capa funcional** — permitir reservar un turno en menos de un minuto, desde cualquier dispositivo, sin fricción.
+
+Ninguna decisión de este documento es válida si destruye alguna de las dos capas. Una animación espectacular que retrasa el booking está mal. Un booking rapidísimo pero visualmente indistinguible de un formulario de SaaS también está mal.
+
+---
+
+## 02 — CREATIVE THESIS
+
+**Bardos no es una barbería. Es una película editorial interactiva sobre identidad, estilo, oficio y transformación, disfrazada de barbería digital.**
+
+La metáfora central que gobierna absolutamente todo — copy, layout, motion, transiciones, arquitectura de información — es:
+
+**EL CORTE COMO ACTO DE EDICIÓN.**
+
+Cortar es quitar. Es editar. Es eliminar ruido para dejar solamente lo necesario. Este concepto no es una estética que se aplica una vez en el hero: es una regla de diseño que se aplica a cada decisión del proyecto. Ante cualquier duda de diseño, la pregunta correcta es: **¿qué estamos mostrando y qué estamos eliminando?**
+
+Principio verbal que resume la tesis (no es necesariamente un slogan final de marketing, es el principio que ordena el criterio de diseño):
+
+**CUT THE NOISE.**
+
+Consecuencia directa: preferimos pocos elementos ejecutados de manera obsesiva a muchos elementos ejecutados de manera mediocre. Si en algún momento el sitio empieza a acumular secciones, colores, animaciones o componentes "porque toda web los tiene", ya te desviaste de la tesis. Volvé a esta sección.
+
+---
+
+## 03 — BRAND UNIVERSE / DNA
+
+Cinco palabras definen el ADN de Bardos. No son adjetivos decorativos: cada una tiene que poder verificarse en el resultado final.
+
+- **RAW** — nada excesivamente pulido. Tiene que quedar algo ligeramente crudo, algo imperfecto, algo humano.
+- **PRECISE** — cada elemento tiene una razón de existir. Nada es "porque queda lindo".
+- **CULTURAL** — no puede sentirse como una empresa genérica. Tiene raíces en moda, música, editorial, cultura urbana.
+- **CINEMATIC** — la navegación tiene ritmo y estructura narrativa, no es una sucesión de secciones.
+- **HUMAN** — hay personas reales detrás de todo esto, no un sistema abstracto.
+
+Estas cinco palabras generan tensiones intencionales que tenés que sostener, no resolver:
+
+- RAW × PRECISE
+- UNDERGROUND × PREMIUM
+- HUMAN × TECHNOLOGICAL
+- STATIC × MOTION
+- EXPERIMENTAL (se siente como arte) × MÁQUINA (funciona con precisión de reloj)
+
+### Dirección creativa elegida
+
+De un proceso de exploración de diez universos creativos distintos (The Cut, The Mirror, The Atelier, The Film, The Archive, The Backstage, The Machine, The Ritual, The Club, The Room), la dirección ganadora es un híbrido, no una elección única:
+
+**BARDOS = THE CUT × THE FILM × THE CLUB**
+
+con préstamos puntuales de:
+
+- **THE ATELIER** → para el tratamiento visual (fotografía de moda, texturas, materiales, sensación de pieza en vez de servicio).
+- **THE BACKSTAGE** → para la humanidad (proceso, manos, herramientas, momentos no completamente posados).
+- **THE MIRROR** → como recurso visual secundario, no protagonista (reflejos puntuales, nunca como gimmick central).
+- **THE ARCHIVE** → para dar profundidad de marca (sensación de que existe una historia y un archivo detrás, no solo una landing).
+
+No mezcles las diez direcciones por igual. THE CUT gobierna la lógica de interacción y transición. THE FILM gobierna la estructura narrativa y el lenguaje de cámara. THE CLUB gobierna el tono cultural y la sensación de pertenencia. El resto son condimentos, no ingredientes principales.
+
+---
+
+## 04 — ART DIRECTION
+
+### 04.1 — Fotografía
+
+Prohibido el stock fotográfico, sin excepciones. La fotografía de Bardos tiene que sentirse como una campaña editorial, no como marketing de barbería convencional.
+
+Tres categorías, y la web tiene que mezclarlas deliberadamente, nunca usarlas de forma aislada por sección:
+
+- **PEOPLE** — retratos frontales, miradas directas, carácter, personas reales (clientes y barberos), nunca modelos de stock sonriendo a cámara.
+- **CRAFT** — manos, máquinas, tijeras, navajas, cabello en detalle extremo, texturas, el proceso mismo del corte.
+- **SPACE** — arquitectura del local, espejos, sillas, materiales, luz.
+
+Tratamiento: flash directo, sombras duras, primeros planos, desenfoques intencionales, momentos ligeramente imperfectos junto a tomas extremadamente cuidadas. La combinación de lo espontáneo y lo pulido es lo que genera humanidad — si todo está perfectamente producido, termina pareciendo otra web de lujo genérica.
+
+### 04.2 — Sistema de color
+
+Base: negro profundo, blanco roto, escala de grises minerales. **Nunca negro puro (#000000) ni blanco puro (#FFFFFF)** — necesitan carácter y temperatura.
+
+Regla central del color de acento — esta es una de las decisiones más importantes de todo el proyecto: **el color de acento no es decorativo, es una señal narrativa.** Aparece únicamente cuando algo fue elegido. El resto de la interfaz permanece neutral. Elegís un servicio → aparece el color. Elegís un barbero → vuelve a aparecer. Llegás a "SESSION CONFIRMED" → el color explota en la pantalla. El color se convierte en el lenguaje visual de la decisión, no en un elemento cosmético permanente.
+
+**Entregable obligatorio de Fase 0:** proponé tres candidatos de color de acento con justificación cultural/psicológica ligada a Bardos y a Buenos Aires, antes de fijar ninguno. Semillas de exploración (no son la decisión final, son puntos de partida):
+
+- Rojo quirúrgico — algo entre `#D91E1E` y `#E5231B`. Preciso, casi clínico, contrasta con lo cultural/urbano.
+- Azul eléctrico nocturno — algo entre `#1B2A6B` y `#1A237E`. Frío, cinematográfico, funciona muy bien sobre negro.
+- Verde ácido puntual — algo entre `#C8FF3D` y `#D4FF4F`. Extremadamente contemporáneo, riesgo alto, potencial de marca alto.
+- Naranja industrial — algo entre `#FF5A1F` y `#FF6B1A`. Cálido, artesanal, remite a herramienta/taller.
+
+Elegí la temperatura de los neutros en función del acento ganador: si el acento es cálido, los negros/grises tienden ligeramente a frío para generar contraste (y viceversa). No definas esto en el vacío — hacelo como sistema.
+
+### 04.3 — Tipografía
+
+Tres roles, nunca dos, nunca uno solo:
+
+- **DISPLAY** — la personalidad de Bardos. Gigante, característica, puede ser grotesca o experimental. Esta es la tipografía que aparece en "BARDOS" a pantalla completa.
+- **EDITORIAL** — para narrativa. Más sofisticada, puede ser una serif contemporánea. Esta es la tipografía de los textos de THE CUT, THE WORLD, etc.
+- **SYSTEM** — información técnica: horarios, precios, metadata, todo el booking. Extremadamente legible. Regla dura: **la tipografía del booking nunca puede sacrificar legibilidad por personalidad.** Arte arriba, precisión abajo.
+
+**Entregable obligatorio de Fase 0:** proponé 2-3 combinaciones concretas, considerando performance de carga (web fonts) y licencia. Semillas de exploración:
+
+- Opción premium (Pangram Pangram u otra foundry independiente): DISPLAY = *PP Neue Machina* o *PP Monument Extended* (agresiva, casi arquitectónica) · EDITORIAL = *PP Editorial New* (serif contemporánea) · SYSTEM = *PP Neue Montreal* o *PP Fraktion Mono* (técnica, catálogo).
+- Opción sin costo de licencia (Google Fonts / Fontshare): DISPLAY = *Archivo Black* / *Big Shoulders Display* / *Space Grotesk* en peso extremo · EDITORIAL = *Spectral* / *Instrument Serif* · SYSTEM = *IBM Plex Mono* / *JetBrains Mono* / *General Sans*.
+
+Evitá *Inter* como default sin justificación — es exactamente el tipo de elección que falla el test de "esto podría existir en otras 500 webs" (sección 18).
+
+### 04.4 — Textura
+
+Grain fotográfico, imperfecciones controladas, texturas de papel o metal según la escena, reflejos, pequeñas aberraciones ópticas. La textura nunca compite con la información — es atmósfera, no contenido.
+
+### 04.5 — Lenguaje de cámara
+
+La web se comporta como una cámara, no como un documento. El scroll y las transiciones de escala/composición simulan:
+
+- **Wide shot** → vemos el espacio completo (THE WORLD).
+- **Medium shot** → vemos a una persona (THE PEOPLE).
+- **Close-up** → vemos una herramienta o un gesto (THE CRAFT).
+- **Macro** → vemos textura de cabello, piel, metal.
+
+Esta progresión de planos es lo que le da al scroll una narrativa visual real, en vez de ser simplemente "bajar la página".
+
+---
+
+## 05 — UX PHILOSOPHY
+
+### 05.1 — Tres capas de profundidad
+
+Pensá cada pantalla como un espacio cinematográfico con tres planos, no como una superficie plana:
+
+- **BACKGROUND** — el mundo: texturas, fotografía ambiental, luz, grain.
+- **MIDGROUND** — información: imágenes, objetos, tipografía secundaria.
+- **FOREGROUND** — interacción: cursor, navegación, booking, tipografía principal.
+
+### 05.2 — Grid
+
+Desktop: 12 columnas, márgenes generosos, con la posibilidad deliberada de romper el grid. Una fotografía puede ocupar 7 columnas, una palabra 11, un dato 2. La ruptura tiene que sentirse intencional, nunca accidental — si rompés el grid, hacelo de forma consistente en toda la pieza equivalente (todos los "datos pequeños" ocupan el mismo ancho de columna relativo, por ejemplo).
+
+### 05.3 — Escala
+
+Jugá deliberadamente con la escala tipográfica: desde metadata microscópica (`BARDOS / BUENOS AIRES / 2026`) hasta una palabra ocupando prácticamente todo el viewport. El contraste de escalas es una firma editorial, no un accidente de responsive.
+
+### 05.4 — La contradicción que sostiene todo
+
+Bardos tiene que sentirse experimental **y** funcionar como una máquina de precisión. Visualmente: arte. Funcionalmente: exactitud. Esa tensión, sostenida sin resolver, es el corazón de la experiencia. Si el sitio se siente "solo lindo" o "solo eficiente", falló.
+
+---
+
+## 06 — INFORMATION ARCHITECTURE
+
+Bardos no tiene páginas. Tiene **escenas**. Esto no es solamente naming — es worldbuilding, y afecta cómo estructurás rutas, SEO y navegación.
+
+| En vez de... | Usamos... |
+|---|---|
+| /servicios | THE CUT |
+| /profesionales | THE ARTISTS |
+| /galeria | THE ARCHIVE |
+| /nosotros | THE SPACE |
+| /reservas | YOUR SESSION |
+
+Estructura de actos que organiza el recorrido completo:
+
+**ACT I — ENTER** (Opening) → **ACT II — SEE** (The World, The People, The Craft) → **ACT III — CHOOSE** (The Cut, selección de servicio) → **ACT IV — BOOK** (Your Session) → **ACT V — ARRIVE** (confirmación, Session Pass, anticipación) → **ACT VI — RETURN** (post-booking, cierre).
+
+### Requisitos de negocio que la exploración creativa original no cubrió y que vos sí tenés que resolver (no son opcionales, son necesarios para que esto funcione como negocio real):
+
+- Cada escena necesita una **ruta real** (`/the-cut`, `/artists`, `/book`, `/session/:id` para el pase de sesión) aunque la experiencia se sienta continua — esto es indispensable para SEO, para compartir un link puntual y para que el Session Pass sea una URL real que el cliente pueda volver a abrir.
+- Metadata SEO por escena (title, description, OG image) escrita en el tono de marca, nunca genérica.
+- Información de ubicación, horarios de atención y contacto tiene que existir en algún punto del recorrido — no como footer lleno de íconos, sino integrada narrativamente (podés resolverla dentro de THE SPACE o como parte del flujo de post-booking "cómo llegar").
+- Un renglón de privacidad breve y con voz de marca en el paso donde se piden datos personales del cliente (nombre, teléfono, email) — no un muro legal genérico, una sola línea honesta con link a la política completa.
+
+---
+
+## 07 — USER JOURNEY
+
+### 07.1 — Arco emocional por tiempo
+
+- **0–3 segundos** — "¿Qué estoy viendo?"
+- **3–10 segundos** — "Está buenísimo."
+- **10–30 segundos** — "Quiero seguir viendo."
+- **30–60 segundos** — "Esta barbería tiene algo."
+- **60+ segundos** — "Quiero ir." → ahí, y no antes, aparece la invitación fuerte a reservar.
+
+El botón de reservar (`BOOK`) tiene que estar siempre accesible desde el segundo cero (en la navegación mínima), pero la invitación *fuerte*, la que empuja emocionalmente, no debería aparecer antes de que el deseo esté construido. No escondas el booking. No lo apures tampoco.
+
+### 07.2 — Journey completo (los seis actos en detalle de estados)
+
+`ENTRADA → Primer impacto → Exploración → Descubrimiento → Deseo → BOOKING → Selección → Personalización → Disponibilidad → Datos → Confirmación → Post-booking → ANTICIPACIÓN`
+
+El tramo final — anticipación — es tan importante como el hero. La experiencia no termina cuando el usuario reserva. Termina cuando el usuario, en el momento en que llega su turno, siente que la marca cumplió lo que prometió en el primer segundo.
+
+---
+
+## 08 — BOOKING ENGINE — "SESSION BUILDER"
+
+Este es el componente central de todo el proyecto. Trátalo con la misma obsesión que el hero, no como un formulario que hay que "meter en algún lado".
+
+### 08.1 — Los seis pasos
+
+`01 SERVICE → 02 ARTIST → 03 DATE → 04 TIME → 05 DETAILS → 06 CONFIRM`
+
+Nunca debe sentirse como un wizard de SaaS. Cada paso reorganiza visualmente la pantalla, no solamente avanza un contador.
+
+### 08.2 — Layout desktop
+
+Composición dividida:
+
+- **Izquierda** — narrativa/fotografía/contexto. Cambia según lo que el usuario va eligiendo: elegís un barbero → su fotografía invade el panel izquierdo. Elegís un horario → aparece metadata del turno ahí mismo.
+- **Derecha** — la selección activa (lista de servicios, grilla de artistas, calendario, horarios, formulario de datos).
+
+### 08.3 — Layout mobile (interpretación propia, no un "desktop achicado")
+
+Una sola columna, información progresiva, bottom sheets donde tenga sentido, targets táctiles grandes, calendario diseñado específicamente para pulgar. Barra persistente arriba o abajo con el resumen de `YOUR SESSION` a medida que se completa. Considerá gestos (swipe entre retratos de artistas) y feedback háptico sutil (`navigator.vibrate`) en la confirmación de cada paso — pero opcional y discreto, nunca invasivo.
+
+### 08.4 — El resumen progresivo ("YOUR SESSION")
+
+Visible de forma permanente mientras se construye la reserva:
+
+```
+SERVICE — — —
+SERVICE — ARTIST —
+SERVICE — ARTIST — DATE
+SERVICE — ARTIST — DATE — TIME
+SESSION READY.
+```
+
+El usuario tiene que sentir que está construyendo algo, no completando un formulario.
+
+### 08.5 — Microinteracción de selección
+
+Cuando el usuario selecciona algo (`CUT`, un artista, un horario), no aparece simplemente un check. La palabra/elemento se desplaza y se fija, la interfaz reorganiza el espacio, la fotografía de contexto cambia, y el color de acento (sección 04.2) aparece. Duración objetivo: **300–700ms**. No tiene que sentirse lento — tiene que sentirse preciso.
+
+### 08.6 — Confirmación como ceremonia
+
+Este es uno de los momentos de mayor peso de todo el proyecto. La interfaz pasa de un modo interactivo a un modo casi ceremonial: se queda en silencio un instante, los elementos se reorganizan, se genera una composición final, y aparece el **Session Pass**.
+
+### 08.7 — Session Pass
+
+Una pieza de marca real, no una confirmación genérica. Contenido mínimo:
+
+```
+BARDOS
+SESSION / BRD-0247
+CUT + BEARD
+ARTIST — [nombre]
+FRIDAY 18:30 · 45 MIN
+BUENOS AIRES
+```
+
+Formato de ID sugerido: prefijo `BRD-` + número correlativo o generado. Tiene que poder **guardarse, compartirse, consultarse de nuevo (vive en una URL real, `/session/:id`), cancelarse y reprogramarse**. No es una pantalla que se muestra y desaparece — es un objeto de marca persistente.
+
+### 08.8 — Post-booking
+
+No termines el flujo en la confirmación. Diseñá explícitamente:
+
+- **Antes de la sesión** — cómo llegar, duración estimada, qué esperar.
+- **Durante** — toda la información de `YOUR SESSION` accesible.
+- **Después** — agradecimiento, invitación a volver a reservar, y dejá la estructura de datos lista para una futura cuenta/historial de sesiones (no hace falta construir el login ahora, pero el modelo de datos tiene que poder soportarlo sin reescritura).
+
+### 08.9 — Confirmación operativa (WhatsApp / email)
+
+Buenos Aires funciona sobre WhatsApp para este tipo de negocio. La confirmación de turno tiene que poder enviarse por WhatsApp (como mínimo viable: link `wa.me` con mensaje prellenado con los datos de la sesión) además de, o en vez de, un email formal. No dejes esto para una v2 silenciosa — es parte del producto mínimo funcional, aunque la integración completa con WhatsApp Business API pueda ser una fase posterior.
+
+### 08.10 — Qué pasa cuando algo falla (ver también sección 17)
+
+Diseñá explícitamente el caso en que un horario que el usuario estaba por confirmar deja de estar disponible (otro cliente lo tomó primero). Esto tiene que sentirse premium, no como un error 409 de API. Ejemplo de tratamiento: el horario elegido se "corta" visualmente de la interfaz (coherente con la metáfora central) y el sistema ofrece inmediatamente las dos alternativas más cercanas, con copy en la voz de marca, nunca "Error: slot unavailable".
+
+### 08.11 — Disponibilidad y backoffice (marcalo como decisión de alcance, no lo ignores)
+
+El modelo de datos de disponibilidad tiene que estar preparado desde el día uno para conectarse a una fuente real de calendario (Google Calendar, Cal.com, o un backend propio con Postgres), aunque la primera versión funcione sobre un mock/JSON tipado. No hardcodees la lógica de disponibilidad de una forma que bloquee esa migración futura. Los barberos van a necesitar, en algún momento, una forma de bloquear/abrir horarios — dejalo señalado como alcance de una fase siguiente, pero el data model (Apéndice C) ya lo contempla.
+
+---
+
+## 09 — VISUAL SYSTEM / DESIGN TOKENS
+
+Los siguientes tokens son un **punto de partida propuesto**, pendiente de la resolución de color/tipografía de la Fase 0. Una vez aprobados los candidatos de la sección 04, formalizalos así:
+
+```css
+:root {
+  /* Neutros — ajustar temperatura según acento ganador */
+  --color-black: #0A0A0A;
+  --color-offwhite: #F3F1EC;
+  --color-gray-100: #1A1A1A;
+  --color-gray-300: #4A4A4A;
+  --color-gray-500: #7A7A7A;
+  --color-gray-700: #B8B8B8;
+
+  /* Acento — reemplazar por el candidato aprobado en Fase 0 */
+  --color-accent: #E5231B;
+
+  /* Tipografía */
+  --font-display: "TBD-Fase0", sans-serif;
+  --font-editorial: "TBD-Fase0", serif;
+  --font-system: "TBD-Fase0", monospace;
+
+  /* Escala tipográfica */
+  --type-micro: 11px;
+  --type-system: clamp(14px, 1vw, 16px);
+  --type-editorial: clamp(22px, 3vw, 40px);
+  --type-display: clamp(64px, 12vw, 220px);
+
+  /* Espaciado — escala base 8px */
+  --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px;
+  --space-5: 24px; --space-6: 32px; --space-7: 48px; --space-8: 64px;
+  --space-9: 96px; --space-10: 128px;
+
+  /* Forma — casi sin radio, nada de "pill" por default */
+  --radius-none: 0px;
+  --radius-sm: 2px;
+
+  /* Grid */
+  --grid-columns: 12;
+  --grid-margin: clamp(16px, 5vw, 96px);
+
+  /* Capas de profundidad (sección 05.1) */
+  --z-background: 0;
+  --z-midground: 10;
+  --z-foreground: 20;
+  --z-overlay: 30;
+}
+```
+
+No uses bordes redondeados grandes ni "pills" por default (ver sección 18) — cualquier radio mayor a `--radius-sm` necesita justificación explícita.
+
+---
+
+## 10 — MOTION SYSTEM / MOTION GRAMMAR
+
+No definas animaciones sueltas. Definís un **vocabulario de movimiento** con nueve verbos, y cada uno de tus componentes usa exclusivamente estos verbos, con significado consistente en toda la pieza.
+
+| Verbo | Qué significa | Timing sugerido | Dónde se usa |
+|---|---|---|---|
+| **CUT** | Cambio abrupto, sin transición suave | instantáneo / 1 frame + frame negro | transiciones entre escenas mayores |
+| **REVEAL** | Algo queda descubierto | 500–900ms, ease-out | aparición de fotografía/texto tras un mask |
+| **DRIFT** | Movimiento lento y continuo | 3–8s, linear/ease-in-out | fondos, parallax sutil |
+| **SNAP** | Movimiento preciso, corto, con propósito | 150–300ms, ease con leve overshoot | selección en el booking |
+| **MORPH** | Una forma se convierte en otra | 400–800ms | cambios de estado de un mismo elemento |
+| **SCALE** | Cambio de escala como narrativa (cámara) | 600–1200ms | transición wide→close-up |
+| **FOCUS** | Blur → sharp | 400–700ms | entrada de un elemento en foco narrativo |
+| **COLLAPSE** | Muchos elementos → uno | 500–900ms | cierre de una selección múltiple |
+| **EXPAND** | Uno → muchos | 500–900ms | apertura del menú full-screen |
+
+### 10.1 — Tres velocidades
+
+- **MICRO** (~120–200ms) — cursor, hover, microdesplazamientos. Casi imperceptible.
+- **CINEMATIC** (600–1200ms) — transiciones de escena, scale, blur, mask, movimiento de cámara.
+- **IMPACT** (raro, deliberado) — un cambio brusco de composición, una fotografía que invade la pantalla, una palabra que atraviesa el viewport.
+
+**Regla de proporción: 90% contención, 10% explosión.** Si usás IMPACT en más del 10% de las transiciones, los momentos fuertes dejan de impactar. Contá tus propios usos de IMPACT antes de dar por terminada una escena.
+
+### 10.2 — El "cut" como sistema de transición
+
+Al menos tres técnicas concretas, no una sola, para que la web no se sienta repetitiva:
+
+1. **Hard cut con frame negro** — imagen A se corta a un frame negro de 1-2 frames, luego aparece imagen B. Sin fade.
+2. **Split-line reveal** — una línea atraviesa la pantalla, la divide, y revela la siguiente escena detrás (`clip-path` animado).
+3. **Crop como puerta** — una fotografía ocupa toda la pantalla, se le aplica un crop agresivo, y el usuario descubre que ese crop era la entrada a la siguiente escena (scale + clip-path combinados).
+
+### 10.3 — Tipos de scroll
+
+- **NORMAL** — contenido informativo estándar.
+- **CINEMATIC** — secciones narrativas con parallax y timing propio, sin secuestrar el control del usuario.
+- **CONTROLLED** (scroll-jacking) — el scroll controla una secuencia específica. **Usalo con extrema moderación**: reservalo para el Opening y, como máximo, un momento puntual dentro de THE CUT. En ningún otro lugar del sitio. Si toda la web secuestra el scroll, deja de sentirse premium y empieza a sentirse molesta.
+
+Implementación sugerida: `Lenis` para scroll suave con inercia + `GSAP ScrollTrigger` para las secuencias controladas + `Framer Motion` para el resto de las animaciones de componente. Ver sección 21.
+
+---
+
+## 11 — INTERACTION SYSTEM
+
+### 11.1 — Cursor
+
+Nada de círculo gigante con texto "VIEW" — es exactamente el tipo de cliché que la sección 18 prohíbe. El cursor de Bardos es casi invisible, con comportamiento contextual:
+
+- Sobre una fotografía → la imagen responde con un desplazamiento sutil (2–4px) según la proximidad del cursor.
+- Sobre un elemento interactivo → cambia de estado (no necesariamente de forma, puede ser el elemento el que reacciona).
+- Sobre el booking → adopta el color de acento.
+- Sobre el menú full-screen → puede generar una distorsión sutil sobre las palabras cercanas.
+
+El usuario no tiene por qué entender exactamente qué está pasando. Que la interfaz se sienta viva de forma casi subliminal es el objetivo, no que el cursor sea el protagonista.
+
+### 11.2 — Estados
+
+Definí explícitamente, para cada componente interactivo: `hover`, `active`, `selected`, `disabled/unavailable`. Ninguno puede ser el estado default del browser sin trabajar.
+
+### 11.3 — Sonido (capa opcional, nunca autoplay)
+
+Nunca autoplay, bajo ninguna circunstancia. Diseñá las interacciones para que puedan soportar sonido más adelante, con hooks de evento ya previstos en el código (`onClick`, `onCut`, `onSelect`, `onConfirm`), aunque la implementación real de audio sea una fase posterior y opt-in (un toggle discreto, nunca un permiso intrusivo).
+
+---
+
+## 12 — COMPONENT SYSTEM
+
+Especificación por componente — cada uno de estos necesita su propio detalle de diseño, no un placeholder genérico:
+
+- **Nav** — minimal y contextual. `BARDOS` a la izquierda, `MENU` / `BOOK` a la derecha. Se transforma según el scroll (puede reducir tamaño, cambiar de color de fondo, o esconderse en scroll-down/reaparecer en scroll-up). `BOOK` siempre a una interacción de distancia, en cualquier punto del recorrido.
+- **Menú full-screen** — takeover a pantalla completa, fondo negro, tipografía gigante, seis ítems numerados (`01/HOME 02/THE CUT 03/ARTISTS 04/SPACE 05/EDITORIAL 06/BOOK`), con reacción sutil al cursor sobre las palabras. Se siente como otra escena de la película, no como un dropdown.
+- **Opening/Hero** — ver Apéndice A para el storyboard segundo a segundo.
+- **Artist card / secuencia de retratos** — tratamiento editorial, no cards de SaaS. Fotografía, nombre, especialidad, un gesto de motion propio al interactuar.
+- **Service selector** — lista seleccionable, explícitamente **no** una grilla de cards con ícono + precio. Cada selección modifica imagen, duración, precio y disponibilidad de artista en tiempo real.
+- **Calendario/selector de horario** — bespoke, con estética editorial. Prohibido que se parezca a un widget de Calendly (ver sección 18).
+- **Session tracker** — la barra/panel de resumen progresivo descrito en 08.4.
+- **Session Pass** — la pieza descrita en 08.7.
+- **Footer** — mínimo, funciona como "créditos finales" de una película, no como sitemap. Sin fila de íconos sociales genérica (ver sección 18) — si Instagram tiene un lugar, que sea narrativo, integrado en THE ARCHIVE o THE PEOPLE, no un ícono más en el footer.
+- **Inputs de formulario** (paso `DETAILS`) — tipografía SYSTEM, foco visible en color de acento, validación en tono de marca (nunca "This field is required" genérico en rojo default del browser).
+- **Toast/notificación de error** — coherente con el motion grammar (sección 10), nunca el alert default del navegador ni un modal genérico.
+
+---
+
+## 13 — RESPONSIVE SYSTEM
+
+Desktop y mobile son **dos interpretaciones del mismo universo**, no un mismo diseño encogido. Diseñalos como dos experiencias con dirección artística propia que comparten ADN.
+
+En mobile, explorá interacciones que no necesariamente existen en desktop:
+
+- Gestos (swipe entre retratos de artistas, swipe para descartar un bottom sheet).
+- Vibración háptica sutil en confirmaciones clave (`navigator.vibrate`, siempre opcional/silencioso si el dispositivo no lo soporta).
+- Scroll cinematográfico ajustado al ritmo de uso con una mano.
+- Navegación por capas (bottom sheets) en vez de modales centrados.
+- Booking optimizado para pulgar: targets grandes, zona de acción en el tercio inferior de la pantalla.
+
+Breakpoints mínimos a validar explícitamente en QA (sección 22): 375, 390, 414, 768, 1024, 1280, 1440, 1920px.
+
+---
+
+## 14 — PERFORMANCE
+
+La riqueza visual no es excusa para un sitio lento. Objetivos concretos, no aspiracionales:
+
+- **LCP < 2.5s**, **CLS cercano a 0**, TTI razonable incluso en conexiones móviles medias.
+- Imágenes en AVIF/WebP con tamaños responsivos, con placeholders de blur-up que encajen con la estética de grain (nunca un skeleton gris genérico).
+- `font-display: swap` con fallback cuyas métricas (x-height, ancho) se aproximen a la tipografía final, para minimizar el salto de layout.
+- Code-splitting por acto/escena — no cargues todo el motion system de golpe.
+- Montaje diferido (lazy) de cualquier efecto pesado (Three.js si se usa, secuencias GSAP complejas) hasta que la escena esté por entrar en viewport.
+- Soporte real de `prefers-reduced-motion`: la experiencia reducida sigue siendo premium, simplemente más calma — nunca "sin animaciones y con aspecto roto".
+- Animar únicamente `transform` y `opacity` (aceleradas por GPU); evitar animar propiedades que disparan layout/reflow.
+
+---
+
+## 15 — ACCESSIBILITY
+
+Accesibilidad real, no un checkbox. Que la interfaz sea vanguardista no exime nada de esto:
+
+- HTML semántico por debajo de la capa cinematográfica: landmarks y jerarquía de encabezados correctos aunque el orden visual esté reordenado con CSS.
+- Foco de teclado rediseñado en el color de acento — nunca el outline default del navegador, pero siempre visible.
+- Todo el flujo de `Session Builder` operable de punta a punta con teclado.
+- Alt text real y descriptivo para las tres categorías de fotografía (People/Craft/Space).
+- Contraste verificado: off-white sobre negro, y cualquier texto sobre el color de acento.
+- Soporte completo de `prefers-reduced-motion` (ver sección 14).
+- Etiquetado accesible (ARIA) de los pasos del Session Builder para lectores de pantalla — el usuario tiene que poder saber en qué paso está y qué eligió, no solo verlo.
+
+---
+
+## 16 — CONTENIDO / COPY DECK
+
+Voz de marca ya establecida en frases cortas en inglés para los momentos de impacto — mantenelas, son parte del lenguaje de marca, no las traduzcas:
+
+- Hero: `BARDOS` / `BUENOS AIRES` → `THE CUT.`
+- Sección tesis (THE CUT): `REMOVE. REFINE. DEFINE. BECOME.`
+- Selector de servicio: `WHAT ARE WE CUTTING?`
+- Selector de artista: `WHO'S CUTTING?`
+- Selector de fecha/hora: `WHEN?`
+- Resumen final antes de confirmar: `YOUR SESSION` → `CONFIRM SESSION`
+- Confirmación: `SEE YOU AT BARDOS.` (idealmente con el dato dinámico: `SEE YOU AT BARDOS, FRIDAY 18:30.`)
+- Cierre/footer: `SEE YOU SOON.`
+
+**Decisión de Fase 0 sobre idioma:** el lenguaje de marca en inglés ya está validado para los momentos de alto impacto (los de arriba). Para la capa funcional/de negocio — ubicación, horarios, aviso de privacidad, mensajes de error, labels de formulario — evaluá si conviene español rioplatense (con voseo, coherente con la audiencia real que va a reservar un turno en Buenos Aires) en vez de inglés total. Presentá esta decisión explícitamente en la Fase 0, no la tomes en silencio: una barbería real necesita que un cliente de cualquier edad entienda cómo reservar, más allá de que la marca hable en inglés en sus momentos de impacto.
+
+Micro-copy de estados (ejemplos de tono, expandí el resto siguiendo esta lógica — nunca genérico tipo "Please try again"):
+
+- Horario que se cae mientras el usuario lo elige: tratamiento narrativo coherente con la metáfora del corte (ver 08.10), nunca un mensaje de error de sistema.
+- Confirmación de reserva enviada por WhatsApp: mensaje prellenado en la voz de marca, con los datos de la sesión ya redactados, no un texto de sistema.
+
+---
+
+## 17 — ESTADOS INVISIBLES / EDGE CASES
+
+Esto es lo que separa una web linda de una web realmente profesional. Cada uno de estos necesita diseño explícito, no el comportamiento default del framework:
+
+`loading` · `hover` · `active` · `selected` · `unavailable` · `error` · `success` · `empty` · `transition` · `carga de imagen` · `red lenta` · `booking fallido` · `booking completado` · `menú mobile` · `navegación hacia atrás` · `cancelación` · `reprogramación`.
+
+Caso obligatorio a resolver con detalle completo, porque es el más delicado de todos: **¿qué pasa si alguien intenta reservar un horario que acaba de desaparecer?** (ya especificado en 08.10 — no lo dejes en un simple mensaje de error).
+
+---
+
+## 18 — ANTI-CLICHÉ / ANTI-AI SYSTEM
+
+Pregunta que se aplica a cada decisión de diseño antes de darla por buena:
+
+**¿Esto podría existir en otras 500 webs? Si la respuesta es sí, se elimina.**
+
+Prohibido explícitamente, sin excepción salvo justificación escrita en el self-critique (sección 20):
+
+- Gradients genéricos "para que se vea premium".
+- Glassmorphism gratuito.
+- Blobs decorativos.
+- Glowing neon sin motivo narrativo.
+- Tarjetas flotantes con sombra sin razón funcional.
+- 3D genérico solo para demostrar capacidad técnica.
+- Cursor extravagante porque "queda cool".
+- Más de un color de acento.
+- Parallax básico de biblioteca sin dirección propia.
+- La ecuación "premium = negro + dorado".
+- Fotografía de stock, en cualquier forma.
+- Títulos genéricos tipo "Experience the art of..." sin personalidad.
+- Bordes redondeados excesivos / todo convertido en "pill".
+- Animar absolutamente todo (la contención importa tanto como el movimiento — sección 10.1).
+- Loaders genéricos innecesarios.
+- Íconos decorativos sin función.
+- Espectáculo visual que compite con y perjudica la conversión.
+- Patrones de dashboard SaaS genérico en el booking.
+- Video hero autoplay en loop sin justificación narrativa.
+- Carruseles de testimonios.
+- Grillas de "3 features" con íconos de librería.
+- El look "gradiente violeta-celeste = hecho con IA".
+- Banner de cookies con el estilo default del template — si existe, tiene que estar diseñado con el mismo criterio que el resto del sitio.
+
+Regla superior que resuelve cualquier caso no listado explícitamente:
+
+**If a design decision feels impressive only because it demonstrates technical capability, reject it.**
+
+---
+
+## 19 — QUALITY BAR / DEFINITION OF DONE
+
+No midas el resultado solamente por "¿es lindo?". Antes de dar cualquier entrega por terminada, evaluá cada área contra estas cinco métricas (mentalmente, del 1 al 10):
+
+- **DESIRE** — ¿genera ganas de ir?
+- **DISCOVERY** — ¿genera ganas de seguir explorando?
+- **CLARITY** — ¿el usuario entiende qué puede hacer en cada momento?
+- **CONVERSION** — ¿se puede reservar rápido y sin fricción?
+- **MEMORY** — ¿alguien va a recordar Bardos al día siguiente?
+
+Si cualquiera de las cinco falla, el trabajo todavía no está terminado, sin importar cuánto código esté escrito.
+
+Test adicional para la firma visual de marca (el elemento — línea, forma, comportamiento — que hace reconocible a Bardos sin logo): **si alguien ve una captura de pantalla del sitio sin el logo visible, ¿puede decir "esto es Bardos"?** Si no, la firma visual todavía no está resuelta.
+
+---
+
+## 20 — SELF-CRITIQUE LOOP
+
+Antes de presentar cualquier entregable de fase (Apéndice B), hacé una auditoría explícita y escrita de tu propio trabajo contra la sección 18 (anti-cliché) y la sección 19 (quality bar). No alcanza con decir "cumple los requisitos" — enumerá específicamente:
+
+1. Qué decisiones de diseño consideraste y **rechazaste**, y por qué.
+2. Qué ítem de la lista anti-cliché estuviste tentado a usar, y cómo lo evitaste.
+3. Puntaje honesto (1–10) en las cinco métricas de la sección 19, con una frase de justificación por cada una.
+
+Esta auditoría es parte del entregable, no un paso opcional interno.
+
+---
+
+## 21 — IMPLEMENTATION / STACK
+
+Recomendación concreta de stack, pensada para sostener motion cinematográfico sin sacrificar performance ni mantenibilidad:
+
+- **Next.js (App Router) + TypeScript** como base.
+- **Tailwind CSS** con un theme completamente custom (los tokens de la sección 09) — nunca la paleta default de Tailwind.
+- **Framer Motion** para animación a nivel de componente (entradas, hover, estados).
+- **GSAP + ScrollTrigger** para las secuencias cinematográficas de scroll controlado (sección 10.3) — reservado a Opening y, como mucho, un momento de THE CUT.
+- **Lenis** para scroll suave con inercia en el resto del sitio.
+- **Zustand** (o Context + `useReducer` si preferís evitar una dependencia más) para el estado del Session Builder — necesita persistir entre pasos y sobrevivir a un refresh accidental (considerar `sessionStorage` como respaldo).
+- **next/image** para todo el pipeline fotográfico (formatos, tamaños responsivos, blur placeholder).
+- **Three.js** — únicamente si una escena puntual lo justifica de verdad (por ejemplo, un tratamiento de THE MIRROR realmente tridimensional). Es opcional y va al final de la lista de prioridades — no lo uses para justificar tu propia capacidad técnica (ver sección 18, última regla).
+- **Booking backend** — empezá con una capa de API tipada y mockeada (JSON local con la forma exacta del Apéndice C), diseñada explícitamente para poder reemplazarse después por Cal.com, Google Calendar API o un backend propio (Postgres + Prisma) sin reescribir la lógica de UI. No hardcodees disponibilidad de una forma que bloquee esa migración.
+- **Confirmación** — link `wa.me` con mensaje prellenado como mínimo viable (sección 08.9), con la estructura lista para integrar WhatsApp Business API o un proveedor de email transaccional más adelante.
+- Deploy target: Vercel (coherente con Next.js).
+
+---
+
+## 22 — QA
+
+- **Visual QA** en los breakpoints listados en la sección 13.
+- **QA funcional** de cada edge case de la sección 17, con foco especial en el caso de horario que desaparece durante la selección.
+- **Cross-browser**, con atención particular a Safari en iOS — los sitios con motion intensivo suelen romperse ahí primero (revisar `position: sticky`, `backdrop-filter`, `clip-path` y cualquier animación basada en scroll).
+- **Lighthouse**: Performance ≥ 90 en mobile (no aspiracional, requisito duro — ver sección 14), Accessibility ≥ 95, Best Practices ≥ 95, SEO ≥ 95.
+
+---
+
+## 23 — FINAL POLISH
+
+La última capa, la que separa "terminado" de "obsesivo":
+
+- Consistencia de curvas de easing en todo el sitio (no mezclar `ease-out` con `cubic-bezier` custom sin criterio).
+- Ritmo vertical consistente sobre la escala base de 8px (sección 09).
+- Alineación óptica, no solo numérica — un texto grande al lado de una imagen puede necesitar 1-2px de ajuste manual para "verse" alineado aunque los números digan que ya lo está.
+- Tono de todo el micro-copy revisado en una sola pasada final para asegurar consistencia de voz.
+- Eliminación de cualquier elemento que se agregó "por si acaso" y que no está sirviendo a ninguna de las cinco métricas de la sección 19.
+
+---
+
+## 24 — GRAN PRINCIPIO
+
+**THE EXPERIENCE SHOULD FEEL EXPENSIVE WITHOUT LOOKING EXPENSIVE.**
+
+Nada de oro. Nada de lujo obvio. Nada de efectos porque sí. El lujo real de este sitio se siente en: timing, espacio, fotografía, tipografía, composición, interacción, precisión, silencio y calidad de ejecución. Si en algún punto dudás entre una opción espectacular y una opción precisa, elegí precisa.
+
+---
+
+## APÉNDICE A — STORYBOARD SEGUNDO A SEGUNDO (OPENING)
+
+Usá esta plantilla como modelo de nivel de detalle para storyboardear el resto de las escenas antes de programarlas (obligatorio como parte de la Fase 0, ver Apéndice B):
+
+- **00:00 — Entry.** Pantalla casi completamente negra. Silencio visual.
+- **00:01 — First information.** Aparece, muy pequeño, `BARDOS / BUENOS AIRES`.
+- **00:03 — Brand reveal.** `BARDOS` aparece gigante, ocupando prácticamente todo el viewport. Movimiento mínimo.
+- **00:05 — User interaction.** El cursor se mueve. La composición responde (micro, sección 10.1) — no es un hover barato, es la palabra empezando a reaccionar a la presencia del usuario.
+- **00:08 — First cut.** Una parte de la palabra `BARDOS` se desplaza. Detrás aparece un fragmento fotográfico (un rostro, una máquina, una mano, un espejo — elegí uno, no los cuatro a la vez).
+- **00:12 — Thesis word.** Aparece `THE CUT.`
+- **00:15 — Invitation to scroll.** Indicación mínima de scroll (no un ícono de mouse genérico — algo coherente con el motion grammar, por ejemplo una línea que sugiere el próximo "corte").
+- **Primer scroll → CUT real.** La pantalla literalmente "corta" (técnica de la sección 10.2) hacia THE WORLD. Empieza el Acto II.
+
+---
+
+## APÉNDICE B — PROCESO DE ENTREGA POR FASES (GATES DE APROBACIÓN)
+
+No avances de fase sin aprobación explícita. Cada fase termina con la instrucción **"ESPERO TU APROBACIÓN ANTES DE CONTINUAR"** — literal, no faltes.
+
+**FASE 0 — Resolución creativa (sin código).**
+Entregables: (a) 3 candidatos de color de acento con justificación (sección 04.2), (b) 2-3 combinaciones tipográficas con consideración de licencia/performance (sección 04.3), (c) propuesta concreta de la firma visual de marca (sección 19), (d) decisión de idioma para la capa funcional (sección 16), (e) storyboard completo de Opening siguiendo el modelo del Apéndice A, (f) confirmación o ajuste de la tesis creativa en un párrafo propio.
+
+**FASE 1 — Design system.**
+Entregables: tokens formalizados (sección 09) con los valores ya aprobados en Fase 0, especificación completa del motion grammar aplicado a componentes reales, arquitectura de componentes (sección 12) con nombres de archivo/carpeta propuestos.
+
+**FASE 2 — Construcción por actos.**
+Construí un acto a la vez (Opening → The World → The People → The Craft → The Cut), no todo en paralelo. Mostrá cada acto terminado antes de pasar al siguiente.
+
+**FASE 3 — Booking engine completo.**
+Session Builder de punta a punta, incluyendo Session Pass, post-booking, y los edge cases de la sección 17.
+
+**FASE 4 — Responsive + accesibilidad + performance.**
+Pasada completa de la sección 13, 14 y 15 sobre todo lo construido.
+
+**FASE 5 — QA + self-critique + final polish.**
+Sección 22, 20 y 23, en ese orden, con la auditoría de la sección 20 presentada por escrito antes de declarar el proyecto terminado.
+
+---
+
+## APÉNDICE C — DATA MODEL DEL BOOKING ENGINE
+
+Boceto inicial, tipado en TypeScript, pensado para poder migrar de mock a backend real sin reescritura de la capa de UI:
+
+```typescript
+interface Service {
+  id: string;
+  name: string;          // "CUT", "CUT + BEARD", "COLOR", "TREATMENT"
+  durationMinutes: number;
+  price: number;
+  imageRef: string;
+}
+
+interface Artist {
+  id: string;
+  name: string;
+  specialty: string;
+  photoRef: string;
+  availableServiceIds: string[];
+}
+
+interface Slot {
+  id: string;
+  artistId: string;
+  date: string;          // ISO date
+  time: string;          // "18:30"
+  available: boolean;
+}
+
+interface Customer {
+  name: string;
+  phone: string;
+  email?: string;
+}
+
+interface Session {
+  id: string;             // "BRD-0247"
+  serviceId: string;
+  artistId: string;
+  slotId: string;
+  customer: Customer;
+  status: "pending" | "confirmed" | "cancelled" | "rescheduled" | "completed";
+  createdAt: string;
+}
+```
+
+Este modelo tiene que sobrevivir intacto el reemplazo del mock inicial por una fuente de disponibilidad real (Cal.com, Google Calendar API, o backend propio) — si una decisión de implementación obliga a romper esta forma, señalalo explícitamente antes de hacerlo, no lo cambies en silencio.

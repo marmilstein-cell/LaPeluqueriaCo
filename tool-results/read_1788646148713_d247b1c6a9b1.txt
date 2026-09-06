@@ -1,0 +1,1107 @@
+     1→"use client";
+     2→// BARDOS — LA CABINA (backoffice de barberos, brief 08.11)
+     3→// Escena oculta en #cabina: la agenda del día, bloqueo de horarios y caja.
+     4→// No está en el menú: la conoce el personal. Código de acceso (CABINA_CODE).
+     5→// Estética: la misma película, pero "entre bastidores" — mono, catálogo, rojo.
+     6→import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+     7→import { createPortal } from "react-dom";
+     8→import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+     9→import { motion, AnimatePresence } from "framer-motion";
+    10→import {
+    11→  fetchAgenda,
+    12→  createBlock,
+    13→  deleteBlock,
+    14→  searchClients,
+    15→  setSessionStatus,
+    16→  type AgendaArtist,
+    17→  type AgendaResponse,
+    18→} from "@/lib/bardos/client";
+    19→import {
+    20→  SHOP,
+    21→  timeToMinutes,
+    22→  minutesToTime,
+    23→  formatLongDate,
+    24→  formatDayLabel,
+    25→  priceARS,
+    26→  nowBuenosAires,
+    27→} from "@/lib/bardos/domain";
+    28→import { useFocusTrap } from "../useFocusTrap";
+    29→import { scrollToScene } from "../providers";
+    30→import { useBooking } from "@/store/booking";
+    31→
+    32→const CABINA_CODE_KEY = "bardos-cabina-code";
+    33→const ROW_H = 52; // px por slot de 30'
+    34→const BLOCK_DURATIONS = [30, 60, 90, 120]; // minutos (múltiplos de slotStep)
+    35→
+    36→/** Routea el hash #cabina — igual patrón que #session/BRD-XXXX. */
+    37→function useCabinaRoute() {
+    38→  const [open, setOpen] = useState(false);
+    39→  useEffect(() => {
+    40→    const parse = () => setOpen(window.location.hash.toLowerCase() === "#cabina");
+    41→    parse();
+    42→    window.addEventListener("hashchange", parse);
+    43→    return () => window.removeEventListener("hashchange", parse);
+    44→  }, []);
+    45→  return open;
+    46→}
+    47→
+    48→export function Cabina() {
+    49→  const routeOpen = useCabinaRoute();
+    50→  // código persistido en sessionStorage (la cabina es de uso diario);
+    51→  // lazy initializer: el overlay nunca se renderiza server-side
+    52→  const [code, setCode] = useState<string | null>(() => {
+    53→    if (typeof window === "undefined") return null;
+    54→    try {
+    55→      return sessionStorage.getItem(CABINA_CODE_KEY);
+    56→    } catch {
+    57→      return null;
+    58→    }
+    59→  });
+    60→  const queryClient = useQueryClient();
+    61→  const overlayRef = useRef<HTMLDivElement>(null);
+    62→  // la agenda arranca en hoy (hora real de San Martín de los Andes)
+    63→  const [date, setDate] = useState(() => nowBuenosAires().iso);
+    64→
+    65→  const close = useCallback(() => {
+    66→    if (window.location.hash.toLowerCase() === "#cabina") {
+    67→      window.history.pushState(null, "", "#book");
+    68→    }
+    69→    window.dispatchEvent(new HashChangeEvent("hashchange"));
+    70→    setTimeout(() => scrollToScene("book"), 60);
+    71→  }, []);
+    72→
+    73→  // congelar el scroll del sitio mientras la cabina está abierta
+    74→  useEffect(() => {
+    75→    if (routeOpen) {
+    76→      const lenis = (window as Window & { __lenis?: { stop(): void; start(): void } }).__lenis;
+    77→      lenis?.stop();
+    78→      document.documentElement.style.overflow = "hidden";
+    79→      // la cabina toma la pantalla: si había un pase abierto, se guarda
+    80→      // (queda en su URL #session/ID y en el historial local).
+    81→      useBooking.setState({ session: null });
+    82→    } else {
+    83→      const lenis = (window as Window & { __lenis?: { stop(): void; start(): void } }).__lenis;
+    84→      lenis?.start();
+    85→      document.documentElement.style.overflow = "";
+    86→    }
+    87→  }, [routeOpen]);
+    88→
+    89→  useFocusTrap(routeOpen, overlayRef, { onEsc: close });
+    90→
+    91→  return (
+    92→    <AnimatePresence>
+    93→      {routeOpen && (
+    94→        <motion.div
+    95→          key="cabina"
+    96→          ref={overlayRef}
+    97→          role="dialog"
+    98→          aria-modal="true"
+    99→          aria-label="La Cabina — gestión interna de Bardos"
+   100→          className="fixed inset-0 z-[80] overflow-y-auto bg-black"
+   101→          initial={{ opacity: 0 }}
+   102→          animate={{ opacity: 1 }}
+   103→          exit={{ opacity: 0 }}
+   104→          transition={{ duration: 0.35 }}
+   105→        >
+   106→          <div className="mx-auto w-full max-w-6xl px-4 pb-24 pt-20 md:px-8 md:pt-24">
+   107→            {!code ? (
+   108→              <CabinaGate
+   109→                onValid={(c) => {
+   110→                  sessionStorage.setItem(CABINA_CODE_KEY, c);
+   111→                  setCode(c);
+   112→                }}
+   113→                onClose={close}
+   114→              />
+   115→            ) : (
+   116→              <CabinaDashboard
+   117→                code={code}
+   118→                date={date}
+   119→                setDate={setDate}
+   120→                onLogout={() => {
+   121→                  sessionStorage.removeItem(CABINA_CODE_KEY);
+   122→                  setCode(null);
+   123→                  queryClient.clear();
+   124→                }}
+   125→                onClose={close}
+   126→              />
+   127→            )}
+   128→          </div>
+   129→        </motion.div>
+   130→      )}
+   131→    </AnimatePresence>
+   132→  );
+   133→}
+   134→
+   135→/* ---------------- GATE: el código de la cabina ---------------- */
+   136→
+   137→function CabinaGate({
+   138→  onValid,
+   139→  onClose,
+   140→}: {
+   141→  onValid: (code: string) => void;
+   142→  onClose: () => void;
+   143→}) {
+   144→  const [value, setValue] = useState("");
+   145→  const [error, setError] = useState<string | null>(null);
+   146→  const [checking, setChecking] = useState(false);
+   147→
+   148→  const submit = async (e: React.FormEvent) => {
+   149→    e.preventDefault();
+   150→    const candidate = value.trim().toUpperCase();
+   151→    if (candidate.length < 3) {
+   152→      setError("El código es más largo.");
+   153→      return;
+   154→    }
+   155→    setChecking(true);
+   156→    setError(null);
+   157→    try {
+   158→      // validación real: la API devuelve 401 si el código no es
+   159→      await fetchAgenda(candidate, nowBuenosAires().iso);
+   160→      onValid(candidate);
+   161→    } catch {
+   162→      setError("Código cortado. Fijate de nuevo.");
+   163→    } finally {
+   164→      setChecking(false);
+   165→    }
+   166→  };
+   167→
+   168→  return (
+   169→    <motion.div
+   170→      className="mx-auto flex min-h-[60vh] max-w-md flex-col justify-center"
+   171→      initial={{ opacity: 0, y: 24 }}
+   172→      animate={{ opacity: 1, y: 0 }}
+   173→      transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+   174→    >
+   175→      <p className="type-micro text-smoke">BARDOS / SOLO PERSONAL</p>
+   176→      <h2 className="font-display font-display-tight type-display-md mt-4 text-offwhite">
+   177→        LA CABINA<span className="text-red">.</span>
+   178→      </h2>
+   179→      <p className="font-editorial-italic mt-4 text-[clamp(17px,1.8vw,22px)] text-chalk/85">
+   180→        Acá se ve el día antes que el cliente.
+   181→      </p>
+   182→
+   183→      <form onSubmit={submit} className="mt-10">
+   184→        <label htmlFor="cabina-code" className="type-micro block text-bone">
+   185→          CÓDIGO DE ACCESO
+   186→        </label>
+   187→        <input
+   188→          id="cabina-code"
+   189→          value={value}
+   190→          onChange={(e) => {
+   191→            setValue(e.target.value.toUpperCase());
+   192→            setError(null);
+   193→          }}
+   194→          autoFocus
+   195→          autoComplete="off"
+   196→          spellCheck={false}
+   197→          disabled={checking}
+   198→          placeholder="••••••"
+   199→          className="b-input mt-2 font-display text-[clamp(22px,3vw,34px)] tracking-[0.32em]"
+   200→          style={{ textTransform: "uppercase" }}
+   201→        />
+   202→        {error && <p className="type-micro mt-3 text-red">{error}</p>}
+   203→        <div className="mt-6 flex items-center gap-6">
+   204→          <button type="submit" disabled={checking} className="b-btn">
+   205→            {checking ? "ABRIENDO…" : "ENTRAR"}
+   206→          </button>
+   207→          <button type="button" onClick={onClose} className="b-link">
+   208→            VOLVER AL SITIO
+   209→          </button>
+   210→        </div>
+   211→      </form>
+   212→    </motion.div>
+   213→  );
+   214→}
+   215→
+   216→/* ---------------- DASHBOARD: agenda + bloqueos + stats ---------------- */
+   217→
+   218→function CabinaDashboard({
+   219→  code,
+   220→  date,
+   221→  setDate,
+   222→  onLogout,
+   223→  onClose,
+   224→}: {
+   225→  code: string;
+   226→  date: string;
+   227→  setDate: (d: string) => void;
+   228→  onLogout: () => void;
+   229→  onClose: () => void;
+   230→}) {
+   231→  const [artistId, setArtistId] = useState<string | null>(null);
+   232→  const qc = useQueryClient();
+   233→  const today = useMemo(() => nowBuenosAires().iso, []);
+   234→
+   235→  const { data, isLoading, isError, refetch } = useQuery({
+   236→    queryKey: ["cabina-agenda", code, date],
+   237→    queryFn: () => fetchAgenda(code, date),
+   238→    enabled: !!date, // date se setea al montar (hoy BA) — evita un fetch inválido
+   239→    refetchInterval: 30_000,
+   240→  });
+   241→
+   242→  // artista activo: selección explícita o el primero del catálogo (estado derivado)
+   243→  const activeArtistId =
+   244→    artistId && data?.artists.some((a) => a.id === artistId)
+   245→      ? artistId
+   246→      : (data?.artists[0]?.id ?? null);
+   247→  const artist = data?.artists.find((a) => a.id === activeArtistId) ?? null;
+   248→  const stats = data?.stats;
+   249→
+   250→  const blockMut = useMutation({
+   251→    mutationFn: (input: {
+   252→      artistId: string;
+   253→      date: string;
+   254→      time: string;
+   255→      minutes?: number;
+   256→      reason?: string;
+   257→    }) => createBlock(code, input),
+   258→    onSuccess: () => {
+   259→      qc.invalidateQueries({ queryKey: ["cabina-agenda"] });
+   260→      // también la disponibilidad pública cambió
+   261→      qc.invalidateQueries({ queryKey: ["availability"] });
+   262→    },
+   263→  });
+   264→
+   265→  const unblockMut = useMutation({
+   266→    mutationFn: (id: string) => deleteBlock(code, id),
+   267→    onSuccess: () => {
+   268→      qc.invalidateQueries({ queryKey: ["cabina-agenda"] });
+   269→      qc.invalidateQueries({ queryKey: ["availability"] });
+   270→    },
+   271→  });
+   272→
+   273→  // ciclo de vida de la sesión: confirmada → completada (el corte está hecho)
+   274→  const statusMut = useMutation({
+   275→    mutationFn: (input: { id: string; status: "completed" | "confirmed" }) =>
+   276→      setSessionStatus(code, input.id, input.status),
+   277→    onSuccess: () => {
+   278→      qc.invalidateQueries({ queryKey: ["cabina-agenda"] });
+   279→    },
+   280→  });
+   281→
+   282→  return (
+   283→    <div>
+   284→      {/* claqueta */}
+   285→      <div className="flex flex-wrap items-center justify-between gap-4">
+   286→        <p className="type-micro text-smoke">
+   287→          BARDOS / CABINA — {formatLongDate(date || today)}
+   288→          {date === today && <span className="text-red"> — HOY</span>}
+   289→        </p>
+   290→        <div className="flex items-center gap-6">
+   291→          <button
+   292→            onClick={() => window.print()}
+   293→            className="b-link"
+   294→            title="Imprimir la hoja de ruta del día"
+   295→          >
+   296→            IMPRIMIR EL DÍA
+   297→          </button>
+   298→          <button
+   299→            onClick={onLogout}
+   300→            className="b-link"
+   301→            title="Salir de la cabina (borra el código de esta sesión)"
+   302→          >
+   303→            SALIR
+   304→          </button>
+   305→          <button onClick={onClose} className="b-link">
+   306→            CERRAR ×
+   307→          </button>
+   308→        </div>
+   309→      </div>
+   310→
+   311→      {/* hoja de ruta imprimible (portal: solo visible en @media print) */}
+   312→      <PrintSheet data={data ?? null} date={date} today={today} />
+   313→
+   314→      <div className="mt-6 flex flex-wrap items-end justify-between gap-6">
+   315→        <h2 className="font-display font-display-tight type-display-sm text-offwhite">
+   316→          LA CABINA<span className="text-red">.</span>
+   317→        </h2>
+   318→
+   319→        {/* picker de día — tira editorial como el builder */}
+   320→        {data && (
+   321→          <div
+   322→            className="-order-1 flex w-full gap-1 overflow-x-auto pb-2 md:order-none md:w-auto"
+   323→            style={{ scrollbarWidth: "thin" }}
+   324→            aria-label="Elegir día"
+   325→          >
+   326→            {data.dates.slice(0, 10).map((d) => {
+   327→              const l = formatDayLabel(d);
+   328→              const isSel = d === date;
+   329→              return (
+   330→                <button
+   331→                  key={d}
+   332→                  onClick={() => setDate(d)}
+   333→                  aria-pressed={isSel}
+   334→                  className={`group flex w-[64px] shrink-0 flex-col items-center border py-2 transition-colors duration-200 ${
+   335→                    isSel
+   336→                      ? "border-red text-offwhite"
+   337→                      : "border-line text-bone hover:border-smoke hover:text-chalk"
+   338→                  }`}
+   339→                >
+   340→                  <span className="type-micro text-[10px]">{l.day}</span>
+   341→                  <span className={`font-display text-[18px] ${isSel ? "text-red" : ""}`}>{l.num}</span>
+   342→                  <span className="type-micro text-[9px] text-smoke">
+   343→                    {d === today ? "HOY" : l.month}
+   344→                  </span>
+   345→                </button>
+   346→              );
+   347→            })}
+   348→          </div>
+   349→        )}
+   350→      </div>
+   351→
+   352→      {/* tabs de artista */}
+   353→      {data && (
+   354→        <div
+   355→          className="mt-8 flex flex-wrap gap-x-8 gap-y-3 border-b border-line pb-4"
+   356→          role="tablist"
+   357→          aria-label="Artistas"
+   358→        >
+   359→          {data.artists.map((a) => (
+   360→            <button
+   361→              key={a.id}
+   362→              role="tab"
+   363→              aria-selected={a.id === activeArtistId}
+   364→              onClick={() => setArtistId(a.id)}
+   365→              className={`font-display text-[clamp(16px,1.8vw,24px)] tracking-[0.04em] transition-colors duration-200 ${
+   366→                a.id === activeArtistId
+   367→                  ? "text-offwhite"
+   368→                  : "text-smoke hover:text-chalk"
+   369→              }`}
+   370→            >
+   371→              {a.name}
+   372→              <span
+   373→                className={`ml-2 inline-block h-1 w-1 rounded-full ${
+   374→                  a.id === activeArtistId ? "bg-red" : "bg-smoke/40"
+   375→                }`}
+   376→                aria-hidden="true"
+   377→              />
+   378→            </button>
+   379→          ))}
+   380→        </div>
+   381→      )}
+   382→
+   383→      {/* cuerpo: agenda + stats */}
+   384→      {isLoading && (
+   385→        <div className="flex flex-col items-center gap-6 py-24" role="status">
+   386→          <span className="cut-line w-20 animate-[pulse-line_1.6s_ease-in-out_infinite] origin-center" />
+   387→          <p className="type-micro text-bone">CARGANDO EL DÍA…</p>
+   388→        </div>
+   389→      )}
+   390→
+   391→      {isError && (
+   392→        <div className="border border-line bg-coal p-8 text-center">
+   393→          <p className="font-display text-[clamp(22px,3vw,36px)] text-offwhite">
+   394→            EL DÍA SE CORTÓ<span className="text-red">.</span>
+   395→          </p>
+   396→          <p className="font-system mt-3 text-[13px] text-bone/80">
+   397→            No pudimos traer la agenda. Puede ser el código o la conexión.
+   398→          </p>
+   399→          <button onClick={() => refetch()} className="b-btn b-btn-ghost mt-6">
+   400→            REINTENTAR
+   401→          </button>
+   402→        </div>
+   403→      )}
+   404→
+   405→      {data && artist && (
+   406→        <div className="mt-8 grid gap-10 lg:grid-cols-12">
+   407→          {/* agenda */}
+   408→          <div className="lg:col-span-8">
+   409→            <AgendaTimeline
+   410→              artist={artist}
+   411→              date={date}
+   412→              onBlock={(time, reason, minutes) =>
+   413→                blockMut.mutate({ artistId: artist.id, date, time, reason, minutes })
+   414→              }
+   415→              onUnblock={(id) => unblockMut.mutate(id)}
+   416→              onComplete={(id) => statusMut.mutate({ id, status: "completed" })}
+   417→              onReopen={(id) => statusMut.mutate({ id, status: "confirmed" })}
+   418→              busy={blockMut.isPending || unblockMut.isPending || statusMut.isPending}
+   419→              error={
+   420→                blockMut.error?.message ??
+   421→                unblockMut.error?.message ??
+   422→                statusMut.error?.message ??
+   423→                null
+   424→              }
+   425→            />
+   426→          </div>
+   427→
+   428→          {/* stats + clientes + ayuda */}
+   429→          <aside className="lg:col-span-4">
+   430→            {stats && (
+   431→              <div className="border border-line bg-coal">
+   432→                <p className="type-micro border-b border-line px-5 py-3 text-red">
+   433→                  EL DÍA EN NÚMEROS
+   434→                </p>
+   435→                <dl className="divide-y divide-line">
+   436→                  <Stat label="SESIONES CONFIRMADAS" value={String(stats.totalBookings)} />
+   437→                  <Stat
+   438→                    label="CORTES COMPLETADOS"
+   439→                    value={`${stats.completed} / ${stats.totalBookings}`}
+   440→                  />
+   441→                  <Stat label="CAJA REALIZADA" value={priceARS(stats.revenueDone)} />
+   442→                  <Stat label="CAJA PROYECTADA" value={priceARS(stats.revenue)} />
+   443→                  <Stat label="MINUTOS BLOQUEADOS" value={String(stats.totalBlockMinutes)} />
+   444→                  <Stat
+   445→                    label="OCUPACIÓN"
+   446→                    value={
+   447→                      stats.capacityMinutes > 0
+   448→                        ? `${Math.round((stats.bookedMinutes / stats.capacityMinutes) * 100)}%`
+   449→                        : "—"
+   450→                    }
+   451→                  />
+   452→                </dl>
+   453→              </div>
+   454→            )}
+   455→
+   456→            {/* búsqueda de clientes: quién llama */}
+   457→            <ClientLookup code={code} />
+   458→            <div className="mt-8 border border-line bg-coal/50 p-5">
+   459→              <p className="type-micro text-smoke">CÓMO SE USA</p>
+   460→              <ul className="mt-3 space-y-2 font-system text-[12px] leading-[1.7] text-bone/90">
+   461→                <li>
+   462→                  <span className="text-chalk">Click en un hueco</span> → bloquea ese horario
+   463→                  (descanso, recado, silla parada). Elegí cuánto dura: 30′ a 120′.
+   464→                </li>
+   465→                <li>
+   466→                  <span className="text-chalk">“✓ CORTADO”</span> → marca la sesión como
+   467→                  completada cuando el cliente ya se fue. Caja realizada al instante.
+   468→                </li>
+   469→                <li>
+   470→                  <span className="text-chalk">Click en un bloqueo</span> → lo corta y el horario
+   471→                  vuelve a la web.
+   472→                </li>
+   473→                <li>
+   474→                  <span className="text-chalk">CLIENTES</span> → buscá por teléfono o nombre y
+   475→                  mirá el historial antes de contestar.
+   476→                </li>
+   477→                <li>
+   478→                  <span className="text-chalk">Las sesiones no se tocan acá</span> — se cortan o
+   479→                  mueven desde el pase del cliente.
+   480→                </li>
+   481→              </ul>
+   482→              <p className="type-micro mt-5 text-smoke/70">
+   483→                ACTUALIZA SOLO CADA 30″ · {SHOP.openHour}–{SHOP.closeHour} HS · SLOT {SHOP.slotStep}′
+   484→              </p>
+   485→            </div>
+   486→          </aside>
+   487→        </div>
+   488→      )}
+   489→    </div>
+   490→  );
+   491→}
+   492→
+   493→function Stat({ label, value }: { label: string; value: string }) {
+   494→  return (
+   495→    <div className="flex items-baseline justify-between px-5 py-4">
+   496→      <dt className="type-micro text-smoke">{label}</dt>
+   497→      <dd className="font-display text-[clamp(18px,2vw,26px)] text-offwhite">{value}</dd>
+   498→    </div>
+   499→  );
+   500→}
+   501→
+   502→/* ---------------- TIMELINE: 10:00→20:00 en slots de 30′ ---------------- */
+   503→
+   504→function AgendaTimeline({
+   505→  artist,
+   506→  date,
+   507→  onBlock,
+   508→  onUnblock,
+   509→  onComplete,
+   510→  onReopen,
+   511→  busy,
+   512→  error,
+   513→}: {
+   514→  artist: AgendaArtist;
+   515→  date: string;
+   516→  onBlock: (time: string, reason: string | undefined, minutes: number) => void;
+   517→  onUnblock: (id: string) => void;
+   518→  onComplete: (id: string) => void;
+   519→  onReopen: (id: string) => void;
+   520→  busy: boolean;
+   521→  error: string | null;
+   522→}) {
+   523→  const [pending, setPending] = useState<string | null>(null); // slot en dialog de bloqueo
+   524→  const [reason, setReason] = useState("");
+   525→  const [duration, setDuration] = useState<number>(SHOP.slotStep);
+   526→  const [confirmUnblock, setConfirmUnblock] = useState<string | null>(null);
+   527→
+   528→  // reloj vivo (30″): la línea AHORA y el sombreado del pasado se mueven solos
+   529→  const [clock, setClock] = useState(() => nowBuenosAires());
+   530→  useEffect(() => {
+   531→    const id = setInterval(() => setClock(nowBuenosAires()), 30_000);
+   532→    return () => clearInterval(id);
+   533→  }, []);
+   534→  const isToday = clock.iso === date;
+   535→
+   536→  // grilla completa: slots de 30' desde openHour hasta closeHour-slotStep
+   537→  const slots = useMemo(() => {
+   538→    const out: string[] = [];
+   539→    for (let t = SHOP.openHour * 60; t < SHOP.closeHour * 60; t += SHOP.slotStep) {
+   540→      out.push(minutesToTime(t));
+   541→    }
+   542→    return out;
+   543→  }, []);
+   544→
+   545→  // bookings y blocks posicionados por índice de slot
+   546→  const bookingsByStart = new Map(artist.bookings.map((b) => [b.time, b]));
+   547→  const blocksByStart = new Map(artist.blocks.map((b) => [b.time, b]));
+   548→  const blockMinutes = (m: number | undefined) => m || SHOP.slotStep;
+   549→
+   550→  // línea de AHORA: posición y visibilidad
+   551→  const nowTop = ((clock.minutes - SHOP.openHour * 60) / SHOP.slotStep) * ROW_H;
+   552→  const showNow =
+   553→    isToday &&
+   554→    clock.minutes >= SHOP.openHour * 60 &&
+   555→    clock.minutes <= SHOP.closeHour * 60;
+   556→
+   557→  const emptyDay = artist.bookings.length === 0 && artist.blocks.length === 0;
+   558→
+   559→  // duraciones que cierran dentro del día (nunca ofrecer un bloqueo imposible)
+   560→  const durationsFor = (time: string) => {
+   561→    const room = SHOP.closeHour * 60 - timeToMinutes(time);
+   562→    return BLOCK_DURATIONS.filter((m) => m <= room);
+   563→  };
+   564→
+   565→  return (
+   566→    <div className="relative">
+   567→      {error && <p className="type-micro mb-4 text-red">{error}</p>}
+   568→
+   569→      {/* encabezado del artista */}
+   570→      <div className="mb-3 flex flex-wrap items-baseline justify-between gap-3">
+   571→        <p className="font-system text-[13px] text-bone">
+   572→          AGENDA — <span className="text-offwhite">{artist.name}</span>
+   573→          {artist.tag && <span className="text-red"> / {artist.tag}</span>}
+   574→        </p>
+   575→        <p className="type-micro text-smoke">
+   576→          {artist.bookings.length} SESIONES ·{" "}
+   577→          {artist.blocks.reduce((sum, bl) => sum + blockMinutes(bl.minutes), 0) / SHOP.slotStep}{" "}
+   578→          SLOTS BLOQUEADOS
+   579→        </p>
+   580→      </div>
+   581→
+   582→      {/* leyenda de lectura rápida */}
+   583→      <div className="mb-5 flex flex-wrap items-center gap-x-6 gap-y-2" aria-hidden="true">
+   584→        <span className="flex items-center gap-2 type-micro text-smoke">
+   585→          <span
+   586→            className="h-2.5 w-2.5 bg-coal"
+   587→            style={{ border: "1px solid var(--color-line)", borderLeft: "3px solid var(--color-red)" }}
+   588→          />
+   589→          SESIÓN
+   590→        </span>
+   591→        <span className="flex items-center gap-2 type-micro text-smoke">
+   592→          <span
+   593→            className="h-2.5 w-2.5"
+   594→            style={{
+   595→              background: "repeating-linear-gradient(-45deg, rgba(229,35,27,0.35) 0 3px, rgba(229,35,27,0.08) 3px 6px)",
+   596→              border: "1px solid rgba(229,35,27,0.5)",
+   597→            }}
+   598→          />
+   599→          BLOQUEO
+   600→        </span>
+   601→        <span className="flex items-center gap-2 type-micro text-smoke">
+   602→          <span className="h-2.5 w-2.5 border border-dashed border-smoke/60" />
+   603→          LIBRE
+   604→        </span>
+   605→        {showNow && (
+   606→          <span className="flex items-center gap-2 type-micro text-red">
+   607→            <span className="h-px w-4 bg-red" />
+   608→            AHORA · {minutesToTime(clock.minutes)}
+   609→          </span>
+   610→        )}
+   611→      </div>
+   612→
+   613→      {emptyDay && (
+   614→        <p className="type-micro mb-4 text-bone/60">
+   615→          EL DÍA ESTÁ LIBRE — click en un hueco para bloquear.
+   616→        </p>
+   617→      )}
+   618→
+   619→      {/* fila de tiempo */}
+   620→      <div className="relative" style={{ minHeight: slots.length * ROW_H }}>
+   621→        {/* gutter de horas */}
+   622→        <div className="absolute inset-y-0 left-0 w-14 select-none" aria-hidden="true">
+   623→          {slots.map((s) => {
+   624→            const [h, m] = s.split(":");
+   625→            const past = isToday && timeToMinutes(s) < clock.minutes;
+   626→            return (
+   627→              <div key={s} className="relative" style={{ height: ROW_H }}>
+   628→                {m === "00" && (
+   629→                  <span className={`type-micro absolute left-0 top-[3px] ${past ? "text-smoke/40" : "text-bone/80"}`}>
+   630→                    {h}:00
+   631→                  </span>
+   632→                )}
+   633→              </div>
+   634→            );
+   635→          })}
+   636→        </div>
+   637→
+   638→        {/* el canvas de slots */}
+   639→        <div className="relative ml-14 md:ml-16" role="list" aria-label={`Agenda de ${artist.name}`}>
+   640→          {slots.map((time) => {
+   641→            const booking = bookingsByStart.get(time);
+   642→            const block = blocksByStart.get(time);
+   643→            const covered = // slot tapado por la cola de una sesión o bloqueo previo
+   644→              artist.bookings.some((b) => {
+   645→                const bStart = timeToMinutes(b.time);
+   646→                return timeToMinutes(time) > bStart && timeToMinutes(time) < bStart + b.minutes;
+   647→              }) ||
+   648→              artist.blocks.some((bl) => {
+   649→                const bStart = timeToMinutes(bl.time);
+   650→                return (
+   651→                  timeToMinutes(time) > bStart &&
+   652→                  timeToMinutes(time) < bStart + blockMinutes(bl.minutes)
+   653→                );
+   654→              });
+   655→            const past = isToday && timeToMinutes(time) < clock.minutes;
+   656→
+   657→            if (booking) {
+   658→              const spanRows = Math.ceil(booking.minutes / SHOP.slotStep);
+   659→              const done = booking.status === "completed";
+   660→              return (
+   661→                <div
+   662→                  key={time}
+   663→                  role="listitem"
+   664→                  className="group absolute inset-x-0 border bg-coal px-4 py-2.5 transition-opacity duration-300"
+   665→                  style={{
+   666→                    height: spanRows * ROW_H - 4,
+   667→                    top: slots.indexOf(time) * ROW_H + 2,
+   668→                    borderLeft: "3px solid var(--color-red)",
+   669→                    borderColor: done ? "rgba(229,35,27,0.25)" : "var(--color-line)",
+   670→                    opacity: done ? 0.62 : 1,
+   671→                  }}
+   672→                >
+   673→                  <div className="flex flex-wrap items-baseline justify-between gap-x-4">
+   674→                    <p
+   675→                      className={`font-system text-[12px] tracking-[0.06em] ${
+   676→                        done ? "text-smoke line-through decoration-red/70" : "text-offwhite"
+   677→                      }`}
+   678→                    >
+   679→                      {booking.time} — {booking.name.toUpperCase()}
+   680→                    </p>
+   681→                    <p className="type-micro text-bone/75">
+   682→                      {booking.serviceName} · {booking.minutes}′ · {priceARS(booking.price)}
+   683→                    </p>
+   684→                  </div>
+   685→                  {booking.notes && (
+   686→                    <p className="type-micro mt-1 truncate text-bone/70">“{booking.notes}”</p>
+   687→                  )}
+   688→                  <div className="mt-1 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+   689→                    <p className="type-micro text-bone/60">
+   690→                      {booking.id} · {booking.phone}
+   691→                    </p>
+   692→                    <button
+   693→                      disabled={busy}
+   694→                      onClick={() => (done ? onReopen(booking.id) : onComplete(booking.id))}
+   695→                      className={`type-micro border px-2 py-0.5 transition-colors duration-200 disabled:opacity-40 ${
+   696→                        done
+   697→                          ? "border-line text-smoke hover:border-smoke hover:text-bone"
+   698→                          : "border-red/50 text-red/90 hover:border-red hover:text-red"
+   699→                      }`}
+   700→                      aria-label={
+   701→                        done
+   702→                          ? `Reabrir sesión ${booking.id} — volver a confirmada`
+   703→                          : `Marcar sesión ${booking.id} como completada`
+   704→                      }
+   705→                      title={done ? "Se marcó por error — reabrir" : "El corte está hecho"}
+   706→                    >
+   707→                      {done ? "REABRIR" : "✓ CORTADO"}
+   708→                    </button>
+   709→                  </div>
+   710→                </div>
+   711→              );
+   712→            }
+   713→
+   714→            if (block) {
+   715→              const spanRows = Math.ceil(blockMinutes(block.minutes) / SHOP.slotStep);
+   716→              return (
+   717→                <button
+   718→                  key={time}
+   719→                  role="listitem"
+   720→                  disabled={busy}
+   721→                  onClick={() => {
+   722→                    if (confirmUnblock === block.id) {
+   723→                      onUnblock(block.id);
+   724→                      setConfirmUnblock(null);
+   725→                    } else {
+   726→                      setConfirmUnblock(block.id);
+   727→                      setPending(null);
+   728→                    }
+   729→                  }}
+   730→                  className="group absolute inset-x-0 px-4 py-2 text-left transition-colors"
+   731→                  style={{
+   732→                    height: spanRows * ROW_H - 4,
+   733→                    top: slots.indexOf(time) * ROW_H + 2,
+   734→                    background:
+   735→                      "repeating-linear-gradient(-45deg, rgba(229,35,27,0.10) 0 6px, rgba(229,35,27,0.03) 6px 12px)",
+   736→                    border: "1px solid rgba(229,35,27,0.35)",
+   737→                  }}
+   738→                  aria-label={`Bloqueado ${time} a ${minutesToTime(
+   739→                    timeToMinutes(time) + blockMinutes(block.minutes)
+   740→                  )} — ${block.reason}. Click para desbloquear.`}
+   741→                >
+   742→                  <div className="flex flex-wrap items-baseline justify-between gap-x-4">
+   743→                    <p className="type-micro text-red/90">
+   744→                      {time}–{minutesToTime(timeToMinutes(time) + blockMinutes(block.minutes))}{" "}
+   745→                      — {block.reason}
+   746→                    </p>
+   747→                    <p className="type-micro text-smoke/70 group-hover:text-bone">
+   748→                      {confirmUnblock === block.id ? "¿SEGURO? CLICK DE NUEVO" : "CORTAR BLOQUEO"}
+   749→                    </p>
+   750→                  </div>
+   751→                  {spanRows > 1 && (
+   752→                    <p className="type-micro mt-1 text-smoke/60">{blockMinutes(block.minutes)}′</p>
+   753→                  )}
+   754→                </button>
+   755→              );
+   756→            }
+   757→
+   758→            if (covered) return null; // la sesión de arriba cubre este slot
+   759→
+   760→            // hueco libre
+   761→            return (
+   762→              <div key={time} role="listitem" className="absolute inset-x-0" style={{ height: ROW_H, top: slots.indexOf(time) * ROW_H }}>
+   763→                <button
+   764→                  disabled={busy || past}
+   765→                  onClick={() => {
+   766→                    setPending(pending === time ? null : time);
+   767→                    setConfirmUnblock(null);
+   768→                    setReason("");
+   769→                    setDuration(durationsFor(time)[0] ?? SHOP.slotStep);
+   770→                  }}
+   771→                  className="absolute inset-0 flex items-center justify-between border border-dashed border-line/70 px-4 text-left transition-colors duration-200 hover:border-smoke disabled:opacity-30"
+   772→                  aria-label={`Horario libre ${time}. Click para bloquear.`}
+   773→                >
+   774→                  <span className={`type-micro ${past ? "text-smoke/40" : "text-bone/70"}`}>
+   775→                    {time}
+   776→                  </span>
+   777→                  {!past && (
+   778→                    <span className="type-micro text-smoke/50 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+   779→                      + BLOQUEAR
+   780→                    </span>
+   781→                  )}
+   782→                </button>
+   783→                {pending === time && (
+   784→                  <form
+   785→                    onSubmit={(e) => {
+   786→                      e.preventDefault();
+   787→                      onBlock(time, reason || undefined, duration);
+   788→                      setPending(null);
+   789→                    }}
+   790→                    className="absolute inset-x-0 z-10 border border-red/40 bg-black px-3 py-2.5 shadow-[0_10px_40px_rgba(0,0,0,0.7)]"
+   791→                    style={{ top: 0, height: "auto", minHeight: ROW_H }}
+   792→                  >
+   793→                    <div className="flex items-center gap-2">
+   794→                      <label className="sr-only" htmlFor={`reason-${time}`}>
+   795→                        Motivo del bloqueo
+   796→                      </label>
+   797→                      <input
+   798→                        id={`reason-${time}`}
+   799→                        value={reason}
+   800→                        onChange={(e) => setReason(e.target.value.toUpperCase())}
+   801→                        placeholder="MOTIVO (OPCIONAL)"
+   802→                        maxLength={60}
+   803→                        autoFocus
+   804→                        className="b-input flex-1 py-1.5 text-[12px]"
+   805→                        style={{ textTransform: "uppercase" }}
+   806→                      />
+   807→                      <button type="submit" disabled={busy} className="b-btn px-3 py-1.5 text-[11px]">
+   808→                        {busy ? "…" : "BLOQUEAR"}
+   809→                      </button>
+   810→                      <button
+   811→                        type="button"
+   812→                        onClick={() => setPending(null)}
+   813→                        className="b-link text-[11px]"
+   814→                      >
+   815→                        NO
+   816→                      </button>
+   817→                    </div>
+   818→                    <div className="mt-2 flex items-center gap-2" role="radiogroup" aria-label="Duración del bloqueo">
+   819→                      <span className="type-micro text-smoke/70">DURACIÓN</span>
+   820→                      {durationsFor(time).map((m) => (
+   821→                        <button
+   822→                          key={m}
+   823→                          type="button"
+   824→                          role="radio"
+   825→                          aria-checked={duration === m}
+   826→                          onClick={() => setDuration(m)}
+   827→                          className={`type-micro border px-2 py-1 transition-colors duration-200 ${
+   828→                            duration === m
+   829→                              ? "border-red text-red"
+   830→                              : "border-line text-smoke hover:border-smoke hover:text-bone"
+   831→                          }`}
+   832→                        >
+   833→                          {m}′
+   834→                        </button>
+   835→                      ))}
+   836→                    </div>
+   837→                  </form>
+   838→                )}
+   839→              </div>
+   840→            );
+   841→          })}
+   842→
+   843→          {/* línea de AHORA: el corte rojo que avanza con el día */}
+   844→          {showNow && (
+   845→            <div
+   846→              className="pointer-events-none absolute inset-x-0 z-20"
+   847→              style={{ top: nowTop }}
+   848→              aria-hidden="true"
+   849→            >
+   850→              <div className="relative h-px bg-red shadow-[0_0_8px_rgba(229,35,27,0.55)]" />
+   851→              <span className="type-micro absolute right-0 -top-4 bg-black/80 px-1 text-red">
+   852→                AHORA
+   853→              </span>
+   854→            </div>
+   855→          )}
+   856→        </div>
+   857→      </div>
+   858→
+   859→      {/* pie: próximas sesiones del día (lista plana para móvil) */}
+   860→      {artist.bookings.length > 0 && (
+   861→        <div className="mt-8 md:hidden">
+   862→          <p className="type-micro text-smoke">SESIONES DE HOY</p>
+   863→          <ul className="mt-2 divide-y divide-line border-t border-line">
+   864→            {artist.bookings.map((b) => (
+   865→              <li key={b.id} className="flex items-baseline justify-between gap-3 py-3">
+   866→                <span
+   867→                  className={`font-system text-[12px] ${
+   868→                    b.status === "completed" ? "text-smoke line-through decoration-red/70" : "text-offwhite"
+   869→                  }`}
+   870→                >
+   871→                  {b.time} — {b.name.toUpperCase()}
+   872→                </span>
+   873→                {b.status === "confirmed" ? (
+   874→                  <button
+   875→                    disabled={busy}
+   876→                    onClick={() => onComplete(b.id)}
+   877→                    className="type-micro border border-red/50 px-2 py-0.5 text-red/90 disabled:opacity-40"
+   878→                  >
+   879→                    ✓ CORTADO
+   880→                  </button>
+   881→                ) : (
+   882→                  <span className="type-micro text-smoke/60">HECHO</span>
+   883→                )}
+   884→              </li>
+   885→            ))}
+   886→          </ul>
+   887→        </div>
+   888→      )}
+   889→    </div>
+   890→  );
+   891→}
+   892→
+   893→/* ---------------- CLIENTES: quién llama ---------------- */
+   894→
+   895→function ClientLookup({ code }: { code: string }) {
+   896→  const [q, setQ] = useState("");
+   897→  const trimmed = q.trim();
+   898→
+   899→  const { data, isFetching, isError } = useQuery({
+   900→    queryKey: ["cabina-clients", code, trimmed],
+   901→    queryFn: () => searchClients(code, trimmed),
+   902→    enabled: trimmed.length >= 2,
+   903→    staleTime: 20_000,
+   904→    retry: false,
+   905→  });
+   906→
+   907→  const clients = data?.clients ?? [];
+   908→
+   909→  return (
+   910→    <div className="mt-8 border border-line bg-coal">
+   911→      <p className="type-micro border-b border-line px-5 py-3 text-red">
+   912→        CLIENTES — QUIÉN LLAMA
+   913→      </p>
+   914→      <div className="p-5">
+   915→        <label htmlFor="cabina-client-search" className="sr-only">
+   916→          Buscar cliente por teléfono o nombre
+   917→        </label>
+   918→        <input
+   919→          id="cabina-client-search"
+   920→          type="search"
+   921→          value={q}
+   922→          onChange={(e) => setQ(e.target.value)}
+   923→          placeholder="TELÉFONO O NOMBRE…"
+   924→          autoComplete="off"
+   925→          className="b-input w-full py-2 text-[12px]"
+   926→        />
+   927→
+   928→        {trimmed.length >= 2 && isFetching && (
+   929→          <p className="type-micro mt-4 text-bone">BUSCANDO…</p>
+   930→        )}
+   931→        {trimmed.length >= 2 && !isFetching && isError && (
+   932→          <p className="type-micro mt-4 text-red">NO SE PUDO BUSCAR. REINTENTÁ.</p>
+   933→        )}
+   934→        {trimmed.length >= 2 && !isFetching && !isError && clients.length === 0 && (
+   935→          <p className="type-micro mt-4 text-smoke">
+   936→            NO HAY COINCIDENCIAS — primera vez que llama.
+   937→          </p>
+   938→        )}
+   939→        {trimmed.length < 2 && (
+   940→          <p className="type-micro mt-4 text-smoke/70">
+   941→            Dos teclas y sabés quién es: su historia y su próxima sesión.
+   942→          </p>
+   943→        )}
+   944→
+   945→        <ul className="mt-4 space-y-5">
+   946→          {clients.map((c) => (
+   947→            <li key={c.phone + c.name} className="border-t border-line pt-4 first:border-t-0 first:pt-0">
+   948→              <p className="font-system text-[13px] text-offwhite">
+   949→                {c.name.toUpperCase()}
+   950→                <span className="ml-2 text-bone/60">{c.phone}</span>
+   951→              </p>
+   952→              <p className="type-micro mt-1.5 text-smoke">
+   953→                {c.totalSessions} {c.totalSessions === 1 ? "SESIÓN" : "SESIONES"} ·{" "}
+   954→                {priceARS(c.spent)}
+   955→                {c.cancelled > 0 && <span className="text-smoke/60"> · {c.cancelled} CORTADAS</span>}
+   956→              </p>
+   957→              {c.nextSession ? (
+   958→                <p className="type-micro mt-2 text-red">
+   959→                  PRÓXIMA — {formatLongDate(c.nextSession.date)} {c.nextSession.time} ·{" "}
+   960→                  {c.nextSession.artist} · {c.nextSession.service}
+   961→                </p>
+   962→              ) : (
+   963→                <p className="type-micro mt-2 text-smoke/70">SIN SESIÓN ACTIVA</p>
+   964→              )}
+   965→              {c.history.length > 0 && (
+   966→                <ul className="mt-2 space-y-1">
+   967→                  {c.history.map((h) => (
+   968→                    <li key={h.id} className="type-micro flex items-baseline justify-between gap-3">
+   969→                      <span className={h.status === "cancelled" ? "text-smoke/40 line-through" : "text-bone/70"}>
+   970→                        {h.date} {h.time} — {h.service}
+   971→                      </span>
+   972→                      <span className="text-smoke/50">{h.artist}</span>
+   973→                    </li>
+   974→                  ))}
+   975→                </ul>
+   976→              )}
+   977→            </li>
+   978→          ))}
+   979→        </ul>
+   980→      </div>
+   981→    </div>
+   982→  );
+   983→}
+   984→
+   985→/* ---------------- HOJA DE RUTA: versión imprimible del día ---------------- */
+   986→
+   987→function PrintSheet({
+   988→  data,
+   989→  date,
+   990→  today,
+   991→}: {
+   992→  data: AgendaResponse | null;
+   993→  date: string;
+   994→  today: string;
+   995→}) {
+   996→  if (!data || typeof document === "undefined") return null;
+   997→
+   998→  const sheet = (
+   999→    <div data-print-root="cabina" className="print-sheet">
+  1000→      <header className="ps-header">
+  1001→        <div>
+  1002→          <p className="ps-brand">BARDOS — LA CABINA</p>
+  1003→          <h1 className="ps-title">HOJA DE RUTA · {formatLongDate(date)}</h1>
+  1004→        </div>
+  1005→        <p className="ps-meta">
+  1006→          {date === today ? "DÍA DE HOY" : "AGENDA"}
+  1007→          <br />
+  1008→          GENERADA {minutesToTime(nowBuenosAires().minutes)} HS
+  1009→        </p>
+  1010→      </header>
+  1011→
+  1012→      <div className="ps-stats">
+  1013→        <span>
+  1014→          SESIONES <strong>{data.stats.totalBookings}</strong>
+  1015→        </span>
+  1016→        <span>
+  1017→          CAJA <strong>{priceARS(data.stats.revenue)}</strong>
+  1018→        </span>
+  1019→        <span>
+  1020→          BLOQUEADO <strong>{data.stats.totalBlockMinutes}′</strong>
+  1021→        </span>
+  1022→        <span>
+  1023→          OCUPACIÓN{" "}
+  1024→          <strong>
+  1025→            {data.stats.capacityMinutes > 0
+  1026→              ? Math.round((data.stats.bookedMinutes / data.stats.capacityMinutes) * 100) + "%"
+  1027→              : "—"}
+  1028→          </strong>
+  1029→        </span>
+  1030→      </div>
+  1031→
+  1032→      {data.artists.map((a) => {
+  1033→        const events = [
+  1034→          ...a.bookings.map((b) => ({
+  1035→            kind: b.status === "completed" ? "done" : "booking",
+  1036→            time: b.time,
+  1037→            minutes: b.minutes,
+  1038→            label: b.name.toUpperCase() + (b.status === "completed" ? " ✓" : ""),
+  1039→            detail: `${b.serviceName} · ${b.minutes}′ · ${priceARS(b.price)}`,
+  1040→            notes: b.notes ?? "",
+  1041→            phone: b.phone,
+  1042→          })),
+  1043→          ...a.blocks.map((bl) => ({
+  1044→            kind: "block" as const,
+  1045→            time: bl.time,
+  1046→            minutes: bl.minutes || SHOP.slotStep,
+  1047→            label: bl.reason,
+  1048→            detail: `BLOQUEO · ${(bl.minutes || SHOP.slotStep)}′`,
+  1049→            notes: "",
+  1050→            phone: "",
+  1051→          })),
+  1052→        ].sort((x, y) => (x.time < y.time ? -1 : 1));
+  1053→
+  1054→        return (
+  1055→          <section key={a.id} className="ps-artist">
+  1056→            <h2 className="ps-artist-name">
+  1057→              {a.name}
+  1058→              {a.tag ? ` — ${a.tag}` : ""}
+  1059→              <span className="ps-artist-meta">
+  1060→                {a.bookings.length} {a.bookings.length === 1 ? "SESIÓN" : "SESIONES"} ·{" "}
+  1061→                {priceARS(a.bookings.reduce((s, b) => s + b.price, 0))}
+  1062→              </span>
+  1063→            </h2>
+  1064→            {events.length === 0 ? (
+  1065→              <p className="ps-empty">— DÍA LIBRE —</p>
+  1066→            ) : (
+  1067→              <table className="ps-table">
+  1068→                <tbody>
+  1069→                  {events.map((e) => (
+  1070→                    <tr key={e.kind + e.time} className={e.kind === "block" ? "ps-block-row" : ""}>
+  1071→                      <td className="ps-time">
+  1072→                        {e.time}–{minutesToTime(timeToMinutes(e.time) + e.minutes)}
+  1073→                      </td>
+  1074→                      <td className="ps-client">{e.label}</td>
+  1075→                      <td className="ps-detail">{e.detail}</td>
+  1076→                      <td className="ps-phone">{e.phone}</td>
+  1077→                    </tr>
+  1078→                  ))}
+  1079→                </tbody>
+  1080→              </table>
+  1081→            )}
+  1082→            {a.bookings.some((b) => b.notes) && (
+  1083→              <div className="ps-notes">
+  1084→                <p className="ps-notes-title">NOTAS DE SESIONES</p>
+  1085→                {a.bookings
+  1086→                  .filter((b) => b.notes)
+  1087→                  .map((b) => (
+  1088→                    <p key={b.id}>
+  1089→                      {b.time} — {b.name.toUpperCase()}: “{b.notes}”
+  1090→                    </p>
+  1091→                  ))}
+  1092→              </div>
+  1093→            )}
+  1094→          </section>
+  1095→        );
+  1096→      })}
+  1097→
+  1098→      <footer className="ps-footer">
+  1099→        CORTÁ EL RUIDO · AV. SAN MARTÍN 2123 · {SHOP.openHour}:00–{SHOP.closeHour}:00 HS · ESTE
+  1100→        PAPEL SE CORTA AL CIERRE
+  1101→      </footer>
+  1102→    </div>
+  1103→  );
+  1104→
+  1105→  return createPortal(sheet, document.body);
+  1106→}
+  1107→

@@ -1,0 +1,833 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+/* ============================================================
+   BARDOS — DESIGN SYSTEM
+   Fase 1 formalizada con los valores aprobados en Fase 0.
+   Negro profundo × off-white papel × rojo quirúrgico narrativo.
+   ============================================================ */
+
+@theme {
+  /* --- Neutrales (negros fríos, off-white papel) --- */
+  --color-black: #0a0a0b;
+  --color-coal: #101012;
+  --color-ash: #17171a;
+  --color-line: #232327;
+  --color-smoke: #5c5c63;
+  --color-bone: #a6a6ac;
+  --color-chalk: #d9d7d1;
+  --color-offwhite: #f4f2ec;
+
+  /* --- Acento: señal narrativa, no decoración --- */
+  --color-red: #e5231b;
+  --color-red-dim: #8c1511;
+
+  /* --- Tipografía (3 roles) --- */
+  --font-display: var(--font-archivo), "Arial Narrow", sans-serif;
+  --font-editorial: var(--font-instrument), Georgia, serif;
+  --font-system: var(--font-plex-mono), "Courier New", monospace;
+
+  /* --- Escala tipográfica --- */
+  --text-micro: 11px;
+  --text-micro--line-height: 1.45;
+  --text-system: 13px;
+  --text-system--line-height: 1.55;
+  --text-body: 15px;
+  --text-body--line-height: 1.6;
+
+  /* --- Espaciado (base 8) --- */
+  --spacing-b1: 8px;
+  --spacing-b2: 16px;
+  --spacing-b3: 24px;
+  --spacing-b4: 32px;
+  --spacing-b5: 48px;
+  --spacing-b6: 64px;
+  --spacing-b7: 96px;
+  --spacing-b8: 128px;
+
+  /* --- Radio: casi ninguno --- */
+  --radius-none: 0px;
+  --radius-sm: 2px;
+
+  /* --- Easing del motion grammar --- */
+  --ease-snap: cubic-bezier(0.2, 0.9, 0.25, 1.15);
+  --ease-cut: cubic-bezier(0.85, 0, 0.15, 1);
+  --ease-reveal: cubic-bezier(0.16, 1, 0.3, 1);
+
+  --animate-drift: drift 9s linear infinite;
+  --animate-grain: grain 700ms steps(6) infinite;
+  --animate-pulse-line: pulse-line 2.2s cubic-bezier(0.85, 0, 0.15, 1) infinite;
+}
+
+/* ---------- Keyframes ---------- */
+@keyframes drift {
+  0% { transform: translate3d(0, 0, 0) scale(1.06); }
+  100% { transform: translate3d(0, -2.2%, 0) scale(1.06); }
+}
+@keyframes grain {
+  0% { transform: translate3d(0, 0, 0); }
+  20% { transform: translate3d(-1.5%, 1%, 0); }
+  40% { transform: translate3d(1%, -1.5%, 0); }
+  60% { transform: translate3d(-1%, -1%, 0); }
+  80% { transform: translate3d(1.5%, 1.5%, 0); }
+  100% { transform: translate3d(0, 0, 0); }
+}
+@keyframes pulse-line {
+  0%, 100% { transform: scaleX(0.55); opacity: 0.7; }
+  50% { transform: scaleX(1); opacity: 1; }
+}
+@keyframes marquee-x {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+/* ============================================================
+   BASE
+   ============================================================ */
+:root {
+  color-scheme: dark;
+  --grid-margin: clamp(16px, 4.5vw, 96px);
+}
+
+* {
+  border-color: var(--color-line);
+}
+
+html {
+  scroll-behavior: auto; /* Lenis maneja el scroll */
+  overflow-x: clip; /* capas cinematográficas (drift/parallax/marquee) pueden sobresalir del viewport: nunca scroll horizontal */
+}
+
+body {
+  background: var(--color-black);
+  color: var(--color-chalk);
+  font-family: var(--font-system);
+  font-size: var(--text-system);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow-x: clip;
+}
+
+::selection {
+  background: var(--color-red);
+  color: var(--color-offwhite);
+}
+
+/* Foco rediseñado: hairline roja, nunca el outline default */
+:focus-visible {
+  outline: 1px solid var(--color-red);
+  outline-offset: 3px;
+}
+
+/* Scrollbar custom (listas largas) */
+*::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+*::-webkit-scrollbar-track {
+  background: var(--color-coal);
+}
+*::-webkit-scrollbar-thumb {
+  background: var(--color-smoke);
+}
+*::-webkit-scrollbar-thumb:hover {
+  background: var(--color-bone);
+}
+
+/* ============================================================
+   TIPOGRAFÍA — 3 ROLES
+   ============================================================ */
+
+/* DISPLAY: grotesca expandida (Archivo wdth 125, 700-900) */
+.font-display {
+  font-family: var(--font-display);
+  font-variation-settings: "wdth" 125;
+  font-weight: 800;
+  letter-spacing: -0.015em;
+  line-height: 0.86;
+  text-transform: uppercase;
+}
+.font-display-tight {
+  letter-spacing: -0.03em;
+}
+
+/* EDITORIAL: serif contemporánea para narrativa */
+.font-editorial {
+  font-family: var(--font-editorial);
+  font-weight: 400;
+  line-height: 1.14;
+  letter-spacing: -0.01em;
+}
+.font-editorial-italic {
+  font-family: var(--font-editorial);
+  font-style: italic;
+  font-weight: 400;
+  line-height: 1.14;
+}
+
+/* SYSTEM: mono técnico para datos, booking, metadata */
+.font-system {
+  font-family: var(--font-system);
+  font-weight: 400;
+  letter-spacing: 0.02em;
+}
+
+/* Escala fluida */
+.type-display {
+  font-size: clamp(56px, 12.5vw, 230px);
+}
+.type-display-md {
+  font-size: clamp(40px, 7vw, 130px);
+}
+.type-display-sm {
+  font-size: clamp(28px, 4.2vw, 76px);
+}
+.type-editorial-lg {
+  font-size: clamp(26px, 3.6vw, 58px);
+}
+.type-editorial-md {
+  font-size: clamp(20px, 2.2vw, 34px);
+}
+.type-mono-label {
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.type-micro {
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+/* ============================================================
+   FIRMA VISUAL — LA LÍNEA DE CORTE
+   Hairline roja quirúrgica que corta composiciones.
+   ============================================================ */
+.cut-line {
+  background: var(--color-red);
+  height: 1px;
+  width: 100%;
+  transform-origin: left center;
+}
+
+/* Traking: metadata tipo claqueta */
+.slate {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--color-smoke);
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.slate::before,
+.slate::after {
+  content: "";
+  height: 1px;
+  background: var(--color-line);
+  flex: 0 1 auto;
+  min-width: 24px;
+}
+.slate::after {
+  flex-grow: 1;
+}
+.slate-left::before {
+  display: none;
+}
+
+/* Número de escena estilo película */
+.scene-no {
+  color: var(--color-smoke);
+  font-size: 10px;
+  letter-spacing: 0.24em;
+}
+
+/* ============================================================
+   COMPONENTES BASE
+   ============================================================ */
+
+/* Enlace interactivo Bardos: hairline que se corta */
+.b-link {
+  position: relative;
+  color: var(--color-bone);
+  transition: color 180ms var(--ease-snap);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 11px;
+}
+.b-link::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -3px;
+  width: 100%;
+  height: 1px;
+  background: var(--color-red);
+  transform: scaleX(0);
+  transform-origin: right center;
+  transition: transform 260ms var(--ease-cut);
+}
+.b-link:hover,
+.b-link:focus-visible {
+  color: var(--color-offwhite);
+}
+.b-link:hover::after,
+.b-link:focus-visible::after {
+  transform: scaleX(1);
+  transform-origin: left center;
+}
+
+/* Botón primario: off-white sobre negro, hover → rojo (decisión = rojo) */
+.b-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  background: var(--color-offwhite);
+  color: var(--color-black);
+  font-family: var(--font-system);
+  font-weight: 500;
+  font-size: 12px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  padding: 18px 36px;
+  border: 1px solid var(--color-offwhite);
+  cursor: pointer;
+  overflow: hidden;
+  transition: color 200ms var(--ease-snap), border-color 200ms var(--ease-snap);
+}
+.b-btn::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--color-red);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 320ms var(--ease-cut);
+  z-index: -1;
+}
+.b-btn:hover::before,
+.b-btn:focus-visible::before {
+  transform: scaleX(1);
+}
+.b-btn:hover,
+.b-btn:focus-visible {
+  color: var(--color-offwhite);
+  border-color: var(--color-red);
+}
+.b-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+/* Variante fantasma */
+.b-btn-ghost {
+  background: transparent;
+  color: var(--color-bone);
+  border: 1px solid var(--color-line);
+}
+.b-btn-ghost:hover,
+.b-btn-ghost:focus-visible {
+  color: var(--color-offwhite);
+  border-color: var(--color-red);
+}
+.b-btn-ghost::before {
+  display: none;
+}
+
+/* Input Bardos */
+.b-input {
+  width: 100%;
+  background: transparent;
+  border: 1px solid var(--color-line);
+  color: var(--color-offwhite);
+  font-family: var(--font-system);
+  font-size: 14px;
+  letter-spacing: 0.04em;
+  padding: 16px 18px;
+  transition: border-color 200ms var(--ease-snap);
+}
+.b-input::placeholder {
+  color: var(--color-smoke);
+}
+.b-input:focus {
+  outline: none;
+  border-color: var(--color-red);
+}
+.b-input[aria-invalid="true"] {
+  border-color: var(--color-red);
+}
+
+/* Marquee del archive */
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: marquee-x 48s linear infinite;
+}
+.marquee-track:hover {
+  animation-play-state: paused;
+}
+
+/* Bordes de la tira infinita: entra y sale de la nada (cinema) */
+.marquee-mask {
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent 0,
+    black 7%,
+    black 93%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to right,
+    transparent 0,
+    black 7%,
+    black 93%,
+    transparent 100%
+  );
+}
+
+/* Foto editorial: duotono tratamiento */
+.b-img {
+  filter: grayscale(1) contrast(1.08) brightness(0.94);
+}
+
+/* máscara de revelado para texto (REVEAL) */
+.mask-line {
+  overflow: hidden;
+  display: block;
+}
+
+/* Grain global */
+.grain-layer {
+  position: fixed;
+  inset: -100px;
+  z-index: 80;
+  pointer-events: none;
+  opacity: 0.055;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 240 240' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 240px 240px;
+  animation: grain 700ms steps(6) infinite;
+}
+
+/* Cursor custom: casi invisible */
+@media (pointer: fine) {
+  .cursor-host, .cursor-host a, .cursor-host button, .cursor-host [role="button"] {
+    cursor: none;
+  }
+}
+
+/* Slot cortado (edge case: horario que desaparece) */
+.slot-cut {
+  position: relative;
+  color: var(--color-smoke) !important;
+  border-color: var(--color-line) !important;
+  pointer-events: none;
+}
+.slot-cut::after {
+  content: "";
+  position: absolute;
+  left: -4%;
+  top: 50%;
+  width: 108%;
+  height: 2px;
+  background: var(--color-red);
+  transform: rotate(-6deg) scaleX(1);
+  transform-origin: left center;
+}
+
+/* accesibilidad: reduce motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  .marquee-track {
+    animation: none;
+  }
+  .grain-layer {
+    animation: none;
+  }
+}
+
+/* utilidades de composición */
+.text-balance {
+  text-wrap: balance;
+}
+.vignette::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(120% 90% at 50% 40%, transparent 55%, rgba(10, 10, 11, 0.55) 100%);
+}
+
+/* ============================================================
+   DETALLES TIPOGRÁFICOS — corrección de oficio
+   ============================================================ */
+
+/* números tabulares en display: la caja y los stats no "bailan" al refrescar */
+.font-display,
+.type-mono-label {
+  font-variant-numeric: tabular-nums;
+}
+
+/* el cursor de texto tinta roja: hasta escribir es parte de la marca */
+input,
+textarea,
+select {
+  caret-color: var(--color-red);
+}
+
+/* placeholder: humo, nunca gritando */
+input::placeholder,
+textarea::placeholder {
+  color: var(--color-smoke);
+  opacity: 0.7;
+}
+
+/* el film strip del archive respeta la mano: pausa al hover */
+.marquee-track:hover,
+.marquee-track:focus-within {
+  animation-play-state: paused;
+}
+
+/* ============================================================
+   PRINT — hoja de ruta (cabina) y pase (ticket)
+   Un único raíz imprimible por vez: [data-print-root].
+   ============================================================ */
+
+[data-print-root] {
+  display: none;
+}
+
+@media print {
+  html,
+  body {
+    background: #fff !important;
+    color: #111 !important;
+    overflow: visible !important;
+    height: auto !important;
+  }
+  /* la app entera se oculta; solo se imprime el raíz marcado */
+  body > *:not([data-print-root]) {
+    display: none !important;
+  }
+  [data-print-root] {
+    display: block !important;
+  }
+}
+
+/* ---- hoja de ruta (LA CABINA) ---- */
+.print-sheet {
+  font-family: var(--font-system);
+  color: #111;
+  padding: 10mm 12mm;
+  max-width: 100%;
+}
+.ps-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  border-bottom: 2px solid #111;
+  padding-bottom: 4mm;
+}
+.ps-brand {
+  font-size: 8pt;
+  letter-spacing: 0.28em;
+  margin: 0 0 2mm;
+}
+.ps-title {
+  font-family: var(--font-display);
+  font-size: 19pt;
+  letter-spacing: -0.01em;
+  margin: 0;
+  text-transform: uppercase;
+}
+.ps-meta {
+  font-size: 8pt;
+  text-align: right;
+  margin: 0;
+  line-height: 1.6;
+}
+.ps-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8mm;
+  font-size: 8.5pt;
+  letter-spacing: 0.08em;
+  padding: 4mm 0;
+  border-bottom: 1px solid #999;
+}
+.ps-stats strong {
+  font-size: 11pt;
+}
+.ps-artist {
+  break-inside: avoid;
+  margin-top: 7mm;
+}
+.ps-artist-name {
+  font-family: var(--font-display);
+  font-size: 13pt;
+  text-transform: uppercase;
+  margin: 0 0 2mm;
+  border-bottom: 1px solid #111;
+  padding-bottom: 1.5mm;
+}
+.ps-artist-meta {
+  font-family: var(--font-system);
+  font-size: 8pt;
+  letter-spacing: 0.06em;
+  float: right;
+}
+.ps-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.ps-table td {
+  padding: 2.2mm 2mm 2.2mm 0;
+  border-bottom: 0.5px solid #ccc;
+  font-size: 9.5pt;
+  vertical-align: baseline;
+}
+.ps-time {
+  white-space: nowrap;
+  width: 22mm;
+  font-weight: 500;
+}
+.ps-client {
+  width: 45mm;
+}
+.ps-block-row td {
+  color: #777;
+  font-style: italic;
+}
+.ps-phone {
+  text-align: right;
+  white-space: nowrap;
+  color: #555;
+}
+.ps-empty {
+  font-size: 9pt;
+  color: #999;
+  font-style: italic;
+  margin: 2mm 0 0;
+}
+.ps-notes {
+  margin-top: 2.5mm;
+  font-size: 8.5pt;
+  line-height: 1.6;
+}
+.ps-notes-title {
+  letter-spacing: 0.22em;
+  font-size: 7pt;
+  margin: 0 0 1.5mm;
+}
+.ps-footer {
+  margin-top: 9mm;
+  padding-top: 3mm;
+  border-top: 1px solid #111;
+  font-size: 7.5pt;
+  letter-spacing: 0.18em;
+  text-align: center;
+}
+
+/* ---- pase del cliente (ticket físico) ---- */
+.print-pass {
+  font-family: var(--font-system);
+  color: #111;
+  padding: 12mm 14mm;
+  max-width: 100%;
+}
+.pp-header {
+  border-bottom: 2px solid #111;
+  padding-bottom: 4mm;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+.pp-brand {
+  font-size: 8pt;
+  letter-spacing: 0.28em;
+  margin: 0 0 2mm;
+}
+.pp-title {
+  font-family: var(--font-display);
+  font-size: 18pt;
+  margin: 0;
+  text-transform: uppercase;
+}
+.pp-code {
+  font-family: var(--font-system);
+  font-size: 11pt;
+  letter-spacing: 0.14em;
+  text-align: right;
+}
+.pp-table {
+  width: 100%;
+  margin-top: 6mm;
+  border-collapse: collapse;
+}
+.pp-table td {
+  padding: 2.4mm 0;
+  border-bottom: 0.5px solid #ccc;
+  font-size: 10.5pt;
+  vertical-align: baseline;
+}
+.pp-key {
+  width: 40mm;
+  font-size: 8pt;
+  letter-spacing: 0.18em;
+}
+.pp-cut {
+  margin: 7mm 0;
+  border: none;
+  border-top: 1.5px dashed #999;
+}
+.pp-strike {
+  text-decoration: line-through;
+  color: #777;
+}
+.pp-notes {
+  font-size: 8.5pt;
+  margin: 4mm 0 0;
+  line-height: 1.6;
+}
+.pp-footer {
+  font-size: 7.5pt;
+  letter-spacing: 0.2em;
+  text-align: center;
+  line-height: 1.8;
+}
+
+/* ============================================================
+   BARDOS — CAPA DE DETALLE 2-c (textura cinematográfica)
+   Seleccionar, scrollear y enfocar también son parte de la marca.
+   ============================================================ */
+
+/* --- selección, scrollbar y focus: la textura de oficio --- */
+::selection {
+  background: var(--color-red);
+  color: #0a0a0b;
+}
+html {
+  scrollbar-color: #2a2a2e transparent; /* Firefox */
+}
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: #0a0a0b;
+}
+::-webkit-scrollbar-thumb {
+  background: #26262a;
+  border: 2px solid #0a0a0b;
+  border-radius: 0;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-red);
+}
+:focus-visible {
+  outline: 1px solid var(--color-red);
+  outline-offset: 3px;
+}
+
+/* --- flicker de proyector: el fotograma respira (máx 0.05, jamás strobe) --- */
+.projector-flicker {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: #000;
+  opacity: 0;
+  animation: projector-flicker 4.5s linear infinite;
+}
+.projector-flicker::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    118% 92% at 50% 44%,
+    transparent 58%,
+    rgba(10, 10, 11, 0.55) 100%
+  );
+  opacity: 0.3;
+  animation: projector-vignette 4.5s ease-in-out infinite;
+}
+/* fotogramas irregulares: la cadencia no es metronomo, es proyección */
+@keyframes projector-flicker {
+  0% { opacity: 0.012; }
+  7% { opacity: 0.05; }
+  9% { opacity: 0.008; }
+  41% { opacity: 0.03; }
+  43% { opacity: 0.048; }
+  71% { opacity: 0.014; }
+  100% { opacity: 0.012; }
+}
+@keyframes projector-vignette {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.5; }
+}
+
+/* --- REC: el tally de la cámara (parpadeo duro, 1.2s) --- */
+.rec-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--color-red);
+  flex: none;
+  animation: rec-blink 1.2s steps(1) infinite;
+}
+@keyframes rec-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.12; }
+}
+
+/* --- marquee smear: el skew lo maneja framer (MotionValue);
+       esta clase solo asegura la capa de composición --- */
+.marquee-smear {
+  will-change: transform;
+}
+
+/* --- chip cut-line: hairline roja que barre el borde superior
+       de chips y slots (misma gramática que las filas de TheCut) --- */
+.chip-cutline::before {
+  content: "";
+  position: absolute;
+  top: -1px;
+  left: 0;
+  width: 100%;
+  height: 1.5px;
+  background: var(--color-red);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 220ms var(--ease-cut);
+  pointer-events: none;
+}
+.chip-cutline:hover::before,
+.chip-cutline:focus-visible::before {
+  transform: scaleX(1);
+}
+/* los cortados y deshabilitados no prometen nada */
+.chip-cutline:disabled::before,
+.slot-cut::before {
+  display: none;
+}
+
+/* reduced motion: ni flicker ni vignette pulsante */
+@media (prefers-reduced-motion: reduce) {
+  .projector-flicker,
+  .projector-flicker::after {
+    animation: none;
+    opacity: 0;
+  }
+  .rec-dot {
+    animation: none;
+    opacity: 1;
+  }
+}
