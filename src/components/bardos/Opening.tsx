@@ -129,53 +129,74 @@ export function Opening() {
 
   /* --- El video no se reproduce nunca: el scroll elige el fotograma.
      Safari/iOS ignora currentTime hasta que el clip "reprodujo" al menos una
-     vez, así que un play()→pause() inmediato lo desbloquea sin que se vea
-     moverse. --- */
+     vez, así que un play()→pause() inmediato lo desbloquea. En móviles (iOS/Android)
+     hace falta además engancharlo al primer touch/scroll para sortear el autoplay policy. --- */
   useEffect(() => {
     const v = videoRef.current;
     if (!v || videoFailed) return;
-    v.muted = true;
-    v.play().then(() => v.pause()).catch(() => {});
+
+    let unlocked = false;
+    const unlock = () => {
+      if (unlocked || !v) return;
+      v.muted = true;
+      v.play()
+        .then(() => {
+          unlocked = true;
+          v.pause();
+        })
+        .catch(() => {});
+    };
+
+    unlock();
+
+    window.addEventListener("touchstart", unlock, { passive: true, once: true });
+    window.addEventListener("touchmove", unlock, { passive: true, once: true });
+    window.addEventListener("scroll", unlock, { passive: true, once: true });
+    window.addEventListener("pointerdown", unlock, { passive: true, once: true });
+
+    return () => {
+      window.removeEventListener("touchstart", unlock);
+      window.removeEventListener("touchmove", unlock);
+      window.removeEventListener("scroll", unlock);
+      window.removeEventListener("pointerdown", unlock);
+    };
   }, [videoFailed]);
 
   /* --- L9 · SCRUBBING: cada pixel de scroll elige un fotograma.
      fotograma = round(progress × 239) → currentTime = centro de ese fotograma.
-     Matemática directa y reversible: si subís el scroll, el pelo sube.
-
-     Dos cosas que el rAF ingenuo no hacía, y son las que se notan:
-       · Cuantizar a fotograma. Pedir un currentTime arbitrario 60 veces por
-         segundo dispara ~60 seeks/s sobre un clip que solo tiene 24 fotogramas
-         por segundo: más de la mitad es trabajo tirado a la basura.
-       · Un solo seek en vuelo. Si le pisás un seek al browser mientras todavía
-         está buscando, aborta el anterior — con scroll rápido eso es un video
-         que se traba. Acá el objetivo nuevo queda pendiente y se aplica cuando
-         el anterior termina ('seeked'): el último pedido siempre gana.
-
-     Además cuelga de scrollYProgress — el mismo valor que mueve la tipografía —
-     en vez de un rAF propio. Si nadie scrollea no corre nada, no se lee layout
-     en cada frame, y el fotograma queda clavado en sincronía con las letras.
-
-     Esto NO se apaga con prefers-reduced-motion, a diferencia del resto del
-     acto. Reduced-motion existe para el movimiento que le pasa al visitante
-     sin que lo pida; acá el visitante ES el motor: mueve mientras scrollea,
-     frena cuando frena, vuelve atrás si sube. Lo que sí se apaga para ellos
-     es todo lo autónomo — flicker, parallax de cursor, vuelo de las letras,
-     los cortes a negro — y queda el clip scrubeando detrás de tipografía
-     quieta. Apagarlo entero dejaba a esos visitantes sin hero. --- */
+     Matemática directa y reversible: si subís el scroll, el pelo sube. --- */
   useEffect(() => {
     const v = videoRef.current;
     if (!v || videoFailed) return;
 
-    let frames = 0;
+    // Default a 240 fotogramas (10s @ 24fps) para que nunca sea 0 en móviles si metadata demora
+    let frames = 240;
     let pending: number | null = null;
+    let seekTimeout: NodeJS.Timeout | null = null;
 
     const flush = () => {
-      if (pending === null || v.seeking) return;
+      if (pending === null) return;
+      if (v.seeking) {
+        if (!seekTimeout) {
+          seekTimeout = setTimeout(() => {
+            seekTimeout = null;
+            if (pending !== null && v) {
+              try {
+                v.currentTime = pending;
+                pending = null;
+              } catch {}
+            }
+          }, 80);
+        }
+        return;
+      }
       const t = pending;
       pending = null;
       // ya estamos dentro de ese fotograma: el seek no cambiaría un pixel
       if (Math.abs(v.currentTime - t) < 0.5 / HERO_FPS) return;
-      v.currentTime = t;
+      try {
+        v.currentTime = t;
+      } catch {}
     };
 
     const seekTo = (p: number) => {
@@ -186,18 +207,25 @@ export function Opening() {
     };
 
     const onMeta = () => {
-      frames = Math.round(v.duration * HERO_FPS);
+      if (v.duration && !isNaN(v.duration) && v.duration > 0) {
+        frames = Math.round(v.duration * HERO_FPS);
+      }
       seekTo(scrollYProgress.get()); // recarga a media página: arranca en el fotograma que toca
     };
 
     if (v.readyState >= 1 /* HAVE_METADATA */) onMeta();
     v.addEventListener("loadedmetadata", onMeta);
+    v.addEventListener("loadeddata", onMeta);
+    v.addEventListener("canplay", onMeta);
     v.addEventListener("seeked", flush);
     const unsubscribe = scrollYProgress.on("change", seekTo);
 
     return () => {
       unsubscribe();
+      if (seekTimeout) clearTimeout(seekTimeout);
       v.removeEventListener("loadedmetadata", onMeta);
+      v.removeEventListener("loadeddata", onMeta);
+      v.removeEventListener("canplay", onMeta);
       v.removeEventListener("seeked", flush);
     };
   }, [videoFailed, scrollYProgress]);
@@ -241,11 +269,12 @@ export function Opening() {
                 poster="/images/hero-scrub-poster.webp"
                 muted
                 playsInline
+                autoPlay
                 preload="auto"
                 disablePictureInPicture
                 onError={() => setVideoFailed(true)}
                 aria-hidden="true"
-                className="b-img h-full w-full object-cover object-center"
+                className="b-img pointer-events-none h-full w-full object-cover object-center"
               />
             )}
           </motion.div>
