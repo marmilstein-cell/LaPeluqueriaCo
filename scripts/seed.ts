@@ -14,7 +14,7 @@ const SERVICES = [
 ];
 
 const ARTISTS = [
-  { id: "santi", name: "TOMÁS BUCHETT", tag: "EL BARBERO", specialty: "CORTE · BARBA · NAVAJA", bio: "Santi Moro corta como quien edita: primero escucha, después quita. Tijera, máquina y navaja con la seriedad de quien firma cada cabeza que sale de su silla.", photo: "/images/artist-santi.webp", rank: 1, services: ["corte", "corte-barba", "color", "tratamiento", "ritual"] },
+  { id: "santi", name: "SANTI MORO", tag: "EL BARBERO", specialty: "CORTE · BARBA · NAVAJA", bio: "Santi Moro corta como quien edita: primero escucha, después quita. Tijera, máquina y navaja con la seriedad de quien firma cada cabeza que sale de su silla.", photo: "/images/artist-santi.webp", rank: 1, services: ["corte", "corte-barba", "color", "tratamiento", "ritual"] },
 ];
 
 // ---------- Datos demo (agenda viva para la cabina y el sitio) ----------

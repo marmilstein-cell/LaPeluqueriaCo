@@ -564,7 +564,7 @@ function HalfWord({
   return (
     <motion.span
       className="font-display font-display-tight type-display block whitespace-nowrap text-offwhite"
-      style={{ clipPath: clip, y }}
+      style={{ clipPath: clip, y, fontSize: "clamp(20px, 6.8vw, 90px)" }}
     >
       <span className="flex" style={{ perspective: 900 }}>
         {LETTERS.map((l, i) => (

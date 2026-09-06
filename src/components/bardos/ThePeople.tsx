@@ -28,7 +28,7 @@ export function ThePeople() {
       </Reveal>
       <Reveal delay={0.12}>
         <p className="font-editorial-italic mt-4 max-w-2xl text-[clamp(18px,2vw,26px)] text-chalk/90">
-          Una silla, un barbero, un solo criterio. Tomás Buchett lleva el
+          Una silla, un barbero, un solo criterio. Santi Moro lleva el
           oficio con la seriedad de quien firma su trabajo.
         </p>
       </Reveal>
