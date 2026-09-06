@@ -625,9 +625,10 @@ function BarberLetter({
   reduced: boolean | null;
 }) {
   const fromLeft = index % 2 === 0;
-  const tIn = 0.55 + index * 0.025;
+  const offset = index / Math.max(1, BARBER.length - 1);
+  const tIn = 0.55 + offset * 0.15;
   const tInEnd = tIn + 0.07;
-  const tOut = 0.74 + index * 0.02;
+  const tOut = 0.74 + offset * 0.15;
   const tOutEnd = tOut + 0.09;
 
   const x = useTransform(progress, [tIn, tInEnd], [fromLeft ? -90 : 90, 0]);
