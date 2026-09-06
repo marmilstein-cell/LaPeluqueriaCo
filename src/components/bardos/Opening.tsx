@@ -23,11 +23,11 @@ import {
 import { BImage } from "./BImage";
 import { useReducedMotionSafe } from "./useReducedMotionSafe";
 
-const LETTERS = ["P", "E", "L", "U", "Q", "U", "E", "R", "Í", "A"];
-const BARBER = ["B", "A", "R", "B", "E", "R"];
+const LETTERS = ["L", "a", "P", "e", "l", "u", "q", "u", "e", "r", "i", "a", "C", "o"];
+const BARBER = ["P", "E", "L", "U", "Q", "U", "E", "R", "I", "A"];
 const MARQUEE_LINE =
   "CABA — BUENOS AIRES — PELUQUERÍA — EST. MMXIX — EL CORTE COMO EDICIÓN — ";
-const MARQUEE_TOP = "LaPeluqueriaCo — BARBER — ";
+const MARQUEE_TOP = "LaPeluqueriaCo — PELUQUERIA — ";
 
 /* El clip del hero (public/videos/hero.mp4): 10s · 24fps · 240 fotogramas,
    encodeado all-intra — cada fotograma es keyframe, así que el seek cae
@@ -360,7 +360,7 @@ export function Opening() {
           style={{ scale: reduced ? 1 : thesisScale, y: reduced ? "12vh" : 0 }}
         >
           <h1
-            aria-label="BARBER."
+            aria-label="PELUQUERIA."
             className="font-display font-display-tight type-display-md px-4 text-center text-offwhite"
           >
             <span aria-hidden="true" className="flex items-baseline justify-center will-change-transform">
